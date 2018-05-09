@@ -1,7 +1,54 @@
 @(items : List[play.api.libs.json.JsValue])
+<link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
 
 @main("provider applies") {
-    @items.foreach { item =>
-        <p>{(item \ "brand_name").asOpt[String]}</p>
+
+    @*<ul>*@
+        @*<li class="wrapper">*@
+            @*<div class="wrapper-info wrapper-item">*@
+                @*<p class="index">00</p>*@
+                @*<p>品牌名称：{(item \ "brand_name").asOpt[String]}</p>*@
+                @*<p>活动地址：{(item \ "address").asOpt[String]}</p>*@
+                @*<p>服务类型：{(item \ "services_type").asOpt[String]}</p>*@
+                @*<p>服务分类：{(item \ "services_leaf").asOpt[String]}</p>*@
+                @*<p>提交日期：{(item \ "date").asOpt[String]}</p>*@
+            @*</div>*@
+            @*<div class="wrapper-detail wrapper-item">*@
+                @*<button class="checkDetail"  onclick="goDetailPage()" >查看详情</button>*@
+            @*</div>*@
+        @*</li>*@
+        @*<li class="wrapper">*@
+            @*<div class="wrapper-info wrapper-item">*@
+                @*<p class="index">11</p>*@
+                @*<p>品牌名称：{(item \ "brand_name").asOpt[String]}</p>*@
+                @*<p>活动地址：{(item \ "address").asOpt[String]}</p>*@
+                @*<p>服务类型：{(item \ "services_type").asOpt[String]}</p>*@
+                @*<p>服务分类：{(item \ "services_leaf").asOpt[String]}</p>*@
+                @*<p>提交日期：{(item \ "date").asOpt[String]}</p>*@
+            @*</div>*@
+            @*<div class="wrapper-detail wrapper-item">*@
+                @*<button class="checkDetail" >查看详情</button>*@
+            @*</div>*@
+        @*</li>*@
+    @*</ul>*@
+    <ul>
+    @items.map { item =>
+
+        <p class="title">@{(item \ "brand_name").asOpt[String]}</p>
+        <li class="wrapper" id="goDetail">
+            <div class="wrapper-info wrapper-item">
+                <p class="apply_id"><span class="itabName">活动序号：</span><span class="index">@{(item \ "apply_id").asOpt[String]}</span></p>
+                <p>品牌名称：@{(item \ "brand_name").asOpt[String]}</p>
+                <p>活动地址：@{(item \ "address").asOpt[String]}</p>
+                <p>服务类型：@{(item \ "service_type").asOpt[String]}</p>
+                <p>服务分类：@{(item \ "service_leaf").asOpt[String]}</p>
+                <p>提交日期：<span class="dateValue">@{(item \ "date").get}</span></p>
+            </div>
+            <div class="wrapper-detail wrapper-item">
+                <button class="checkDetail btn_default" >查看详情</button>
+            </div>
+        </li>
     }
+    </ul>
+    <script src="@routes.Assets.versioned("javascripts/hello.js")" type="text/javascript" defer="defer"></script>
 }

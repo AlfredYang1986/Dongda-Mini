@@ -1,7 +1,26 @@
 @(item : play.api.libs.json.JsValue)
-
+<link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
 @main("provider apply") {
     @{
-        <p>{(item \ "brand_name").asOpt[String]}</p>
+        <p class="title">{(item \ "brand_name").asOpt[String].get}</p>
+        <ul class="detailInfo">
+            <li><span class="tabName">contact</span> <span class="tagValue">{(item \ "contact").asOpt[String].get}</span> </li>
+            <li><span class="tabName">contact_no</span> <span class="tagValue">{(item \ "contact_no").asOpt[String].get}</span> </li>
+            <li><span class="tabName">brand_name</span> <span class="tagValue">{(item \ "brand_name").asOpt[String].get}</span> </li>
+            <li><span class="tabName">service_type</span> <span class="tagValue">{(item \ "service_type").asOpt[String].get}</span> </li>
+            <li><span class="tabName">service_leaf</span> <span class="tagValue">{(item \ "service_leaf").asOpt[String].get}</span> </li>
+            <li><span class="tabName">input_pwd</span> <span class="tagValue">{(item \ "input_pwd").asOpt[String].get}</span> </li>
+            <li><span class="tabName">address</span> <span class="tagValue">{(item \ "address").asOpt[String].get}</span> </li>
+            <li><span class="tabName">age_range</span> <span class="tagValue">{(item \ "age_boundary" \ "low").asOpt[Int].get} ~ {(item \ "age_boundary" \ "up").asOpt[Int].get}</span></li>
+            <li><span class="tabName">approved</span> <span class="tagValue">{(item \ "approved").asOpt[Int].get}</span> </li>
+            <li><span class="tabName">date</span> <span class="tagValue date">{(item \ "date").get}</span> </li>
+            </ul>
+        <div class="checkBtn">
+        <button class="btn_default">确认信息</button></div>
     }
+    <script type="text/javascript" defer="defer">
+            var date = document.getElementsByClassName('date')[0];
+            var daydate = new Date(date.innerHTML - 0);
+            date.innerHTML = daydate.getFullYear() +"-"+ (daydate.getMonth() + 1 )+"-" + daydate.getDate();
+    </script>
 }

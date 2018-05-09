@@ -1,0 +1,78 @@
+.wrapper {
+    list-style: none;
+    margin: 10px 0;
+    padding: 0 20px;
+    border: 1px solid #676767;
+}
+.wrapper .wrapper-item {
+    display: inline-block;
+
+}
+.wrapper .wrapper-info{
+    padding-left: 50px;
+    height: 200px;
+    border-radius: 5px;
+}
+.wrapper .wrapper-info p {
+
+    height: 18px;
+    line-height: 18px;
+    font-size: 14px;
+}
+.wrapper .wrapper-detail {
+    float: right;
+    padding-right: 180px;
+    padding-top: 80px;
+    height: 120px;
+    line-height: 200px;
+    vertical-align: top;
+    text-align: center;
+
+}
+.wrapper .wrapper-detail button {
+
+    height: 40px;
+    width: 80px;
+    border-radius: 5px;
+    border: 1px solid #676767;
+}
+.btn_default {
+    width: 80px;
+    height: 40px;
+    border: 1px solid #676767;
+    border-radius: 5px;
+    background-color: #66c1b9;
+    color: #fff;
+}
+.title {
+    margin: 10px;
+    padding: 5px 20px;
+    font-size: 24px;
+}
+.detailInfo {
+
+}
+.detailInfo li {
+    margin: 5px 0 5px 40px;
+    list-style: none;
+    height: 30px;
+    line-height: 30px;
+    font-size: 18px;
+}
+li:nth-child(odd) {
+    color: lightseagreen;
+}
+.tabName {
+    display: inline-block;
+    width: 100px;
+    text-align: right;
+}
+.tagValue {
+    display: inline-block;
+    padding-left: 5px;
+    letter-spacing: 1px;
+    text-align: center;
+}
+.checkBtn {
+    text-align: center;
+}
