@@ -16,8 +16,9 @@ trait condition {
         (con \ "approved").asOpt[Int].map (x => builder += "approved" -> x).getOrElse(Unit)
         (con \ "wechat_open_id").asOpt[String].map (x => builder += "wechat.wechat_open_id" -> x).getOrElse(Unit)
 
-        val reVal = builder.result
-        if (reVal.isEmpty) DBObject("search" -> "null")
-        else reVal
+//        val reVal = builder.result
+//        if (reVal.isEmpty) DBObject("search" -> "null")
+//        else reVal
+        builder.result
     }
 }

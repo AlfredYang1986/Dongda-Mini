@@ -1,0 +1,7 @@
+@(items : List[play.api.libs.json.JsValue])
+
+@main("provider applies") {
+    @items.foreach { item =>
+        <p>{(item \ "brand_name").asOpt[String]}</p>
+    }
+}

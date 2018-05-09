@@ -1,0 +1,7 @@
+@(item : play.api.libs.json.JsValue)
+
+@main("provider apply") {
+    @{
+        <p>{(item \ "brand_name").asOpt[String]}</p>
+    }
+}
