@@ -6,8 +6,8 @@ import com.pharbers.bmmessages.CommonMessage
 abstract class msg_UserCommand extends CommonMessage(cat ="user", mt = UserModule)
 
 object UserMessage {
-    case class msg_pushUserApply(data : JsValue) extends msg_UserCommand
-    case class msg_popUserApply(data : JsValue) extends msg_UserCommand
-    case class msg_queryUserApply(data : JsValue) extends msg_UserCommand
-    case class msg_searchUserApply(data : JsValue) extends msg_UserCommand
+    case class msg_pushUser(data : JsValue) extends msg_UserCommand
+    case class msg_popUser(data : JsValue) extends msg_UserCommand
+    case class msg_queryUser(data : JsValue) extends msg_UserCommand
+    case class msg_searchUsers(data : JsValue) extends msg_UserCommand
 }

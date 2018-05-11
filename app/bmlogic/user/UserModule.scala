@@ -1,5 +1,6 @@
 package bmlogic.user
 
+import bmlogic.common.mergestepresult.MergeStepResult
 import bmlogic.user.UserData.{condition, creation, result}
 import bmlogic.user.UserMessage._
 import com.mongodb.casbah.Imports._
@@ -13,35 +14,43 @@ import play.api.libs.json.Json.toJson
 object UserModule extends ModuleTrait {
 
     def dispatchMsg(msg: MessageDefines)(pr: Option[Map[String, JsValue]])(implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
-        case msg_pushUserApply(data) => pushUserApply(data)
-        case msg_popUserApply(data) => popUserApply(data)
-        case msg_queryUserApply(data) => queryUserApply(data)
-        case msg_searchUserApply(data) => searchUserApply(data)
+        case msg_pushUser(data) => pushUser(data)(pr)
+        case msg_popUser(data) => popUser(data)
+        case msg_queryUser(data) => queryUser(data)(pr)
+        case msg_searchUsers(data) => searchUsers(data)
         case _ => ???
     }
 
     object inner_traits extends creation with result with condition
 
-    def pushUserApply(data : JsValue)
+    def pushUser(data : JsValue)
+                     (pr : Option[Map[String, JsValue]])
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
             val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
             val db = conn.queryDBInstance("cli").get
 
-            import inner_traits.m2d
-            val o : DBObject = data
-            db.insertObject(o, "user_applies", "_id")
-            val reVal = o.get("_id").asInstanceOf[ObjectId].toString
-
-            (Some(Map("apply_id" -> toJson(reVal))), None)
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+            if ((js \ "user").asOpt[String].map (x => x == "not exist").getOrElse(false)) {
+                import inner_traits.m2d
+                val o : DBObject = js
+                db.insertObject(o, "users", "_id")
+                val reVal = o.get("_id").asInstanceOf[ObjectId].toString
+                (Some(m ++ Map("user" -> toJson(Map("user_id" -> reVal)))), None)
+            } else {
+                val user = (js \ "user").asOpt[JsValue].get
+                val reVal = (user \ "user_id").asOpt[String].get
+                (Some(m ++ Map("user" -> toJson(Map("user_id" -> reVal)))), None)
+            }
 
         } catch {
             case ex : Exception => println(s"push.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
-    def popUserApply(data : JsValue)
+    def popUser(data : JsValue)
                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
@@ -50,35 +59,41 @@ object UserModule extends ModuleTrait {
 
             import inner_traits.qc
             val o : DBObject = data
-            db.deleteObject(o, "user_applies", "_id")
+            db.deleteObject(o, "users", "_id")
 
             (Some(Map("pop user apply" -> toJson("success"))), None)
 
         } catch {
-            case ex : Exception => println(s"push.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"pop.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
-    def queryUserApply(data : JsValue)
-                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+    def queryUser(data : JsValue)
+                 (pr : Option[Map[String, JsValue]])
+                 (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
 
             val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
             val db = conn.queryDBInstance("cli").get
 
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
             import inner_traits.qc
             import inner_traits.d2m
-            val o: DBObject = data
-            val reVal = db.queryObject(o, "user_applies").get
-
-            (Some(Map("user_apply" -> toJson(reVal))), None)
+            val o: DBObject = js
+            db.queryObject(o, "users").map { reVal =>
+                (Some(Map("user" -> toJson(reVal)) ++ m), None)
+            }.getOrElse(
+                (Some(Map("user" -> toJson("not exist")) ++ m), None)
+            )
 
         } catch {
-            case ex: Exception => println(s"pop.error=${ex.getMessage}"); (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex: Exception => println(s"query.error=${ex.getMessage}"); (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
-    def searchUserApply(data : JsValue)
+    def searchUsers(data : JsValue)
                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
@@ -92,12 +107,12 @@ object UserModule extends ModuleTrait {
             import inner_traits.sc
             import inner_traits.d2m
             val o : DBObject = data
-            val reVal = db.queryMultipleObject(o, "user_applies", take = take, skip = skip)
+            val reVal = db.queryMultipleObject(o, "users", take = take, skip = skip)
 
-            (Some(Map("user_applies" -> toJson(reVal))), None)
+            (Some(Map("user" -> toJson(reVal))), None)
 
         } catch {
-            case ex : Exception => println(s"pop.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"search.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

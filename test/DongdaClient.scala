@@ -66,4 +66,14 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 response.json
             }
     }
+
+    def pushProvider(push_info : JsValue) ={
+        ws.url(baseUrl + "/provider/push")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(push_info)
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
 }

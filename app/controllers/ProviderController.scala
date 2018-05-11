@@ -19,27 +19,27 @@ class ProviderController @Inject() (as_inject: ActorSystem, dbt : dbInstanceMana
     import com.pharbers.bmpattern.LogMessage.common_log
     import com.pharbers.bmpattern.ResultMessage.common_result
 
-    def pushApplies = Action (request => raq.requestArgs(request) { jv =>
-        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push"))), jv)
-            :: msg_pushProviderApply(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
-    })
-
-    def popApplies = Action (request => raq.requestArgs(request) { jv =>
-        MessageRoutes(msg_log(toJson(Map("method" -> toJson("pop"))), jv)
-            :: msg_popProviderApply(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
-    })
-
-    def queryApplies = Action (request => raq.requestArgs(request) { jv =>
-        MessageRoutes(msg_log(toJson(Map("method" -> toJson("query"))), jv)
-            :: msg_queryProviderApply(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
-    })
-
-    def searchApplies = Action (request => raq.requestArgs(request) { jv =>
-        MessageRoutes(msg_log(toJson(Map("method" -> toJson("query"))), jv)
-            :: msg_searchProviderApply(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
-    })
+//    def pushApplies = Action (request => raq.requestArgs(request) { jv =>
+//        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push"))), jv)
+//            :: msg_pushProviderApply(jv)
+//            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+//    })
+//
+//    def popApplies = Action (request => raq.requestArgs(request) { jv =>
+//        MessageRoutes(msg_log(toJson(Map("method" -> toJson("pop"))), jv)
+//            :: msg_popProviderApply(jv)
+//            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+//    })
+//
+//    def queryApplies = Action (request => raq.requestArgs(request) { jv =>
+//        MessageRoutes(msg_log(toJson(Map("method" -> toJson("query"))), jv)
+//            :: msg_queryProviderApply(jv)
+//            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+//    })
+//
+//    def searchApplies = Action (request => raq.requestArgs(request) { jv =>
+//        MessageRoutes(msg_log(toJson(Map("method" -> toJson("query"))), jv)
+//            :: msg_searchProviderApply(jv)
+//            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+//    })
 }
