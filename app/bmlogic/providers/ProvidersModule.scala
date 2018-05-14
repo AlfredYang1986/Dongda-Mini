@@ -132,12 +132,10 @@ object ProvidersModule extends ModuleTrait {
             val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
             val db = conn.queryDBInstance("cli").get
 
-            println(data)
             import inner_traits.asc
             import inner_traits.d2m
             val o : DBObject = data
             val reVal = db.queryMultipleObject(o, "providers")
-            println(reVal)
 
             (Some(Map("providers" -> toJson(reVal))), None)
 
