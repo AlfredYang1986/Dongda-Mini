@@ -76,4 +76,14 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 response.json
             }
     }
+
+    def checkinWithScores(check_info : JsValue) = {
+        ws.url(baseUrl + "/checkin/scores")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(check_info)
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
 }

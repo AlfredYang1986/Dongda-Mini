@@ -30,15 +30,16 @@ object CheckInModule extends ModuleTrait {
             val db = conn.queryDBInstance("cli").get
 
             val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
             if ((js \ "is_check").asOpt[Int].map (x => x == 0).getOrElse(false)) {
                 import inner_traits.m2d
                 val o : DBObject = js
                 db.insertObject(o, "checkin", "_id")
                 val reVal = o.get("_id").asInstanceOf[ObjectId].toString
 
-                (Some(Map("check_in" -> toJson(reVal))), None)
+                (Some(Map("check_in" -> toJson(reVal)) ++ m), None)
             } else {
-                (Some(Map("check_in" -> toJson("already checked"))), None)
+                (Some(Map("check_in" -> toJson("already checked")) ++ m), None)
             }
 
 

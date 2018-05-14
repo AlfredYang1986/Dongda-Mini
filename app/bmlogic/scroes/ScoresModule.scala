@@ -1,0 +1,92 @@
+package bmlogic.scroes
+
+import bmlogic.common.mergestepresult.MergeStepResult
+import bmlogic.scroes.ScoresData._
+import bmlogic.scroes.ScoresMessage._
+import com.mongodb.casbah.Imports._
+import com.pharbers.ErrorCode
+import com.pharbers.bmmessages.{CommonModules, MessageDefines}
+import com.pharbers.bmpattern.ModuleTrait
+import com.pharbers.dbManagerTrait.dbInstanceManager
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json.toJson
+
+object ScoresModule extends ModuleTrait {
+
+    def dispatchMsg(msg: MessageDefines)(pr: Option[Map[String, JsValue]])(implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
+        case msg_addScores(data) => addScores(data)(pr)
+        case msg_queryScores(data) => queryScores(data)(pr)
+    }
+
+    object inner_traits extends creation with condition with result
+
+    def addScores(data : JsValue)
+                  (pr : Option[Map[String, JsValue]])
+                  (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            if ((js \ "check_in").asOpt[String].map (x => x == "already checked").getOrElse(false)) {
+                (pr, None)
+            } else {
+                if ((js \ "scores").asOpt[String].map(x => x == "not exist").getOrElse(false)) {
+
+                    import inner_traits.m2d
+                    import inner_traits.d2m
+                    val o: DBObject = js
+                    db.insertObject(o, "scores", "_id")
+                    val reVal: Map[String, JsValue] = o
+
+                    (Some(m ++ Map("scores" -> toJson(reVal))), None)
+
+                } else {
+
+                    import inner_traits.qc
+                    val o: DBObject = js
+                    val reVal =
+                        db.queryObject(o, "scores") { obj =>
+                            val up: DBObject = inner_traits.up2d(js, obj)
+                            db.updateObject(up, "scores", "_id")
+                            import inner_traits.d2m
+                            up
+                        }
+
+                    (Some(m ++ Map("scores" -> toJson(reVal))), None)
+                }
+            }
+
+        } catch {
+            case ex : Exception => println(s"add scores.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def queryScores(data : JsValue)
+                   (pr : Option[Map[String, JsValue]])
+                   (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            import inner_traits.sc
+            import inner_traits.d2m
+            val o : DBObject = js
+            db.queryObject(o, "scores").map { x =>
+                (Some(Map("scores" -> toJson(x)) ++ m), None)
+            }.getOrElse {
+                (Some(Map("scores" -> toJson("not exist")) ++ m), None)
+            }
+
+        } catch {
+            case ex : Exception => println(s"query scores.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+}

@@ -3,6 +3,7 @@ package controllers
 import akka.actor.ActorSystem
 import bmlogic.checkin.CheckInMessage.{msg_isChecked, msg_pushCheckIn}
 import bmlogic.providers.ProvidersMessage.msg_queryProviderOne
+import bmlogic.scroes.ScoresMessage.{msg_addScores, msg_queryScores}
 import bmlogic.user.UserMessage.msg_queryUser
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
@@ -27,6 +28,18 @@ class CheckInController @Inject() (as_inject: ActorSystem, dbt : dbInstanceManag
             :: msg_queryProviderOne(jv)
             :: msg_isChecked(jv)
             :: msg_pushCheckIn(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
+
+    def checkinScores = Action (request => raq.requestArgs(request) { jv =>
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push"))), jv)
+            :: msg_queryUser(jv)
+            :: msg_queryUser(jv)
+            :: msg_queryProviderOne(jv)
+            :: msg_isChecked(jv)
+            :: msg_pushCheckIn(jv)
+            :: msg_queryScores(jv)
+            :: msg_addScores(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 }
