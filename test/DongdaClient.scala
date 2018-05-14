@@ -86,4 +86,28 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 response.json
             }
     }
+
+    def pushLevel(level_info : JsValue) = {
+        ws.url(baseUrl + "/level/push")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(level_info)
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def queryLevel(provider_id : String) = {
+        ws.url(baseUrl + "/level/query")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "condition" -> toJson(Map(
+                    "provider_id" -> toJson(provider_id)
+                ))
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
 }

@@ -47,8 +47,8 @@ class ScoresSpec extends Specification {
             val result = (reVal \ "result").asOpt[JsValue].get
 
             println(result)
-            (result \ "scores" \ "scores_A").asOpt[Int].get must_== 1
-            (result \ "scores" \ "scores_B").asOpt[Int].get must_== 0
+            (result \ "scores" \ "scores_A").asOpt[Int].get must_== 0
+            (result \ "scores" \ "scores_B").asOpt[Int].get must_== 1
             (result \ "scores" \ "scores_C").asOpt[Int].get must_== 0
         }
 
@@ -59,8 +59,8 @@ class ScoresSpec extends Specification {
             val result = (reVal \ "result").asOpt[JsValue].get
 
             println(result)
-            (result \ "scores" \ "scores_A").asOpt[Int].get must_== 1
-            (result \ "scores" \ "scores_B").asOpt[Int].get must_== 0
+            (result \ "scores" \ "scores_A").asOpt[Int].get must_== 0
+            (result \ "scores" \ "scores_B").asOpt[Int].get must_== 1
             (result \ "scores" \ "scores_C").asOpt[Int].get must_== 0
         }
 
@@ -71,8 +71,8 @@ class ScoresSpec extends Specification {
             val result = (reVal \ "result").asOpt[JsValue].get
 
             println(result)
-            (result \ "scores" \ "scores_A").asOpt[Int].get must_== 2
-            (result \ "scores" \ "scores_B").asOpt[Int].get must_== 0
+            (result \ "scores" \ "scores_A").asOpt[Int].get must_== 1
+            (result \ "scores" \ "scores_B").asOpt[Int].get must_== 1
             (result \ "scores" \ "scores_C").asOpt[Int].get must_== 0
         }
     }

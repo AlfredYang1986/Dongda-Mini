@@ -11,9 +11,16 @@ trait creation {
         val builder = MongoDBObject.newBuilder
         builder += "_id" -> ObjectId.get()
 
-        builder += "scores_A" -> (data \ "scores_A").asOpt[Int].map (x => x.asInstanceOf[Number]).getOrElse(1.asInstanceOf[Number])
-        builder += "scores_B" -> (data \ "scores_B").asOpt[Int].map (x => x.asInstanceOf[Number]).getOrElse(0.asInstanceOf[Number])
-        builder += "scores_C" -> (data \ "scores_C").asOpt[Int].map (x => x.asInstanceOf[Number]).getOrElse(0.asInstanceOf[Number])
+        val (a, b, c) =
+            (js \ "level").asOpt[String].map (x => x).getOrElse("scores_A") match {
+                case "scores_A" => (1, 0, 0)
+                case "scores_B" => (0, 1, 0)
+                case "scores_C" => (0, 0, 1)
+            }
+
+        builder += "scores_A" -> a
+        builder += "scores_B" -> b
+        builder += "scores_C" -> c
         builder += "user_id" -> (data \ "user" \ "user_id").asOpt[String].get
 
         builder.result
@@ -22,9 +29,17 @@ trait creation {
     implicit val up2d : (JsValue, DBObject) => DBObject = { (js, obj) =>
         val data = js
         assert(obj.getAs[String]("user_id").get == (data \ "user" \ "user_id").asOpt[String].get)
-        val tmp_A = (obj.getAs[Number]("scores_A").get.intValue + (data \ "scores" \ "scores_A").asOpt[Int].get.intValue)
-        val tmp_B = (obj.getAs[Number]("scores_B").get.intValue + (data \ "scores" \ "scores_B").asOpt[Int].get.intValue)
-        val tmp_C = (obj.getAs[Number]("scores_C").get.intValue + (data \ "scores" \ "scores_C").asOpt[Int].get.intValue)
+
+        val (a, b, c) =
+            (js \ "level").asOpt[String].map (x => x).getOrElse("scores_A") match {
+                case "scores_A" => (1, 0, 0)
+                case "scores_B" => (0, 1, 0)
+                case "scores_C" => (0, 0, 1)
+            }
+
+        val tmp_A = obj.getAs[Number]("scores_A").get.intValue + a
+        val tmp_B = obj.getAs[Number]("scores_B").get.intValue + b
+        val tmp_C = obj.getAs[Number]("scores_C").get.intValue + c
         obj += "scores_A" -> tmp_A.asInstanceOf[Number]
         obj += "scores_B" -> tmp_B.asInstanceOf[Number]
         obj += "scores_C" -> tmp_C.asInstanceOf[Number]
