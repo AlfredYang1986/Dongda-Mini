@@ -10,8 +10,12 @@ POST     /provider/push                          controllers.ProvidersController
 POST     /checkin                                controllers.CheckInController.checkinScores
 POST     /checkin/scores                         controllers.CheckInController.checkinScores
 
+POST     /scores/query                           controllers.CheckInController.queryScores
+
 POST     /level/push                             controllers.CheckInController.pushLevel
 POST     /level/query                            controllers.CheckInController.queryLevel
+
+POST     /provider/search                        controllers.ProvidersController.searchProviders
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

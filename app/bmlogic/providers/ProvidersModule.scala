@@ -19,7 +19,7 @@ object ProvidersModule extends ModuleTrait {
         case msg_queryProvider(data) => queryProvider(data)
         case msg_queryProviderMulti(data) => queryProviderMulti(data)
         case msg_queryProviderOne(data) => queryProviderOne(data)(pr)
-        case msg_searchProvider(data) => ???
+        case msg_searchProvider(data) => searchProviders(data)
         case _ => ???
     }
 
@@ -122,6 +122,27 @@ object ProvidersModule extends ModuleTrait {
 
         } catch {
             case ex : Exception => println(s"push.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def searchProviders(data : JsValue)
+                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            println(data)
+            import inner_traits.asc
+            import inner_traits.d2m
+            val o : DBObject = data
+            val reVal = db.queryMultipleObject(o, "providers")
+            println(reVal)
+
+            (Some(Map("providers" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => println(s"search provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

@@ -25,19 +25,19 @@ class ProvidersController @Inject() (as_inject: ActorSystem, dbt : dbInstanceMan
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 
-    def popApplies = Action (request => raq.requestArgs(request) { jv =>
+    def popProvider = Action (request => raq.requestArgs(request) { jv =>
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("pop"))), jv)
             :: msg_popProvider(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 
-    def queryApplies = Action (request => raq.requestArgs(request) { jv =>
+    def queryProvider = Action (request => raq.requestArgs(request) { jv =>
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("query"))), jv)
             :: msg_queryProvider(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 
-    def searchApplies = Action (request => raq.requestArgs(request) { jv =>
+    def searchProviders = Action (request => raq.requestArgs(request) { jv =>
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("query"))), jv)
             :: msg_searchProvider(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))

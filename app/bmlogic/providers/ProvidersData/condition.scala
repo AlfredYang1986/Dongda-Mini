@@ -14,8 +14,8 @@ trait condition {
     implicit val mc : JsValue => DBObject = { js =>
         val lst = (js \ "condition" \ "providers").asOpt[List[String]].get
         lst match {
-            case xls : List[String] => $or(xls map (x => DBObject("_id" -> new ObjectId(x))))
             case Nil => DBObject("search" -> "null")
+            case xls : List[String] => $or(xls map (x => DBObject("_id" -> new ObjectId(x))))
         }
     }
 
@@ -27,6 +27,12 @@ trait condition {
         val builder = MongoDBObject.newBuilder
         builder += "brand_name" -> tmp
 
+        builder.result
+    }
+
+    implicit val asc : JsValue => DBObject = { js =>
+//        val con = (js \ "condition").asOpt[JsValue].get
+        val builder = MongoDBObject.newBuilder
         builder.result
     }
 }
