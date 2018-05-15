@@ -162,4 +162,29 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 response.json
             }
     }
+
+    def checkAnswers(wechat_id : String, check_lst : List[String], answer_lst : List[Int]) = {
+        val ua =
+            (check_lst zip answer_lst) map { x =>
+                toJson(Map(
+                    "answer_id" -> toJson(x._1),
+                    "answer" -> toJson(x._2)
+                ))
+            }
+
+        ws.url(baseUrl + "/answer/check")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "condition" -> toJson(Map(
+                    "wechat_id" -> toJson(wechat_id),
+                    "answers" -> toJson(check_lst)
+
+                )),
+                "answers" -> toJson(ua)
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
 }

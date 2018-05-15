@@ -12,6 +12,7 @@ trait result {
             "scores_B" -> toJson(obj.getAs[Number]("scores_B").get.intValue),
             "scores_C" -> toJson(obj.getAs[Number]("scores_C").get.intValue),
             "scores_D" -> toJson(obj.getAs[Number]("scores_D").map (x => x.intValue).getOrElse(0)),
+            "scores_E" -> toJson(obj.getAs[Number]("scores_E").map (x => x.intValue).getOrElse(0)),
             "user_id" -> toJson(obj.getAs[String]("user_id").get)
         )
     }

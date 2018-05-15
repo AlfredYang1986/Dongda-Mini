@@ -17,6 +17,7 @@ object ScoresModule extends ModuleTrait {
         case msg_addScores(data) => addScores(data)(pr)
         case msg_queryScores(data) => queryScores(data)(pr)
         case msg_preAnswerScores(data) => preAnswerScores(data)(pr)
+        case msg_postAnswerScores(data) => postAnswerScores(data)(pr)
     }
 
     object inner_traits extends creation with condition with result
@@ -124,9 +125,42 @@ object ScoresModule extends ModuleTrait {
                 } else {
                     (Some(m ++ Map("answer opp" -> toJson(0))), None)
                 }
-
-
             }
+
+        } catch {
+            case ex : Exception => println(s"pre answer scores.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def postAnswerScores(data : JsValue)
+                        (pr : Option[Map[String, JsValue]])
+                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            if ((js \ "answers_check").asOpt[Int].map(x => x == 1).getOrElse(false)) {
+
+                import inner_traits.sc
+                val o: DBObject = js
+//                val reVal =
+                    db.queryObject(o, "scores") { obj =>
+                        val up: DBObject = inner_traits.ac2d(js, obj)
+                        db.updateObject(up, "scores", "_id")
+                        import inner_traits.d2m
+                        up
+                    }
+
+//                (pr, None)
+//            } else {
+//                (pr, None)
+            }
+
+            (Some(m - "user" - "status"), None)
 
         } catch {
             case ex : Exception => println(s"pre answer scores.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))

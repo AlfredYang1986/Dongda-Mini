@@ -49,9 +49,10 @@ class AnswerSpec extends Specification {
         This is a dongda to check the profile logic string
 
             The 'dongda' answers test
-                random 5 answer info              $randomAnswersTest
+                check 5 answer info              $checkAnswersTest
                                                                               """
 //    push 5 answer info              $pushMultiAnswer
+//    random 5 answer info              $randomAnswersTest
 
     def pushMultiAnswer = {
         0 until 9 map { x =>
@@ -78,6 +79,23 @@ class AnswerSpec extends Specification {
             val result = (reVal \ "result").asOpt[JsValue].get
             val answers = (result \ "answers").asOpt[List[JsValue]].get
             answers.length must_!= 0
+        }
+    }
+
+    def checkAnswersTest = {
+
+        val wechat_id = "oV3gY45JriaqY8EiXruXSHtt4xj0"
+        val check_lst = "5afa86089be8b51257bcd7b3" :: "5afa86089be8b51257bcd7b4" :: "5afa86089be8b51257bcd7b5" :: "5afa86089be8b51257bcd7b6" :: "5afa86089be8b51257bcd7b7" :: Nil
+        val answer_lst = 1 :: 1 :: 1 :: 1 :: 1 :: Nil
+
+        WsTestClient.withClient { client =>
+            val reVal = Await.result(
+                new DongdaClient(client, "http://127.0.0.1:9000").checkAnswers(wechat_id, check_lst, answer_lst), time_out)
+
+            println(reVal)
+            val result = (reVal \ "result").asOpt[JsValue].get
+            val answers = (result \ "answers_check").asOpt[Int].get
+            answers must_== 1
         }
     }
 }

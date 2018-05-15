@@ -18,7 +18,7 @@ object answerModule extends ModuleTrait {
 
     def dispatchMsg(msg: MessageDefines)(pr: Option[Map[String, JsValue]])(implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_pushAnswer(data) => pushAnswer(data)
-        case msg_checkAnswers(data) => checkAnswers(data)
+        case msg_checkAnswers(data) => checkAnswers(data)(pr)
         case msg_randomAnswers(data) => randomAnswers(data)(pr)
         case msg_randomGenerator(data) => randomGenerator(data)(pr)
         case _ => ???
@@ -46,11 +46,15 @@ object answerModule extends ModuleTrait {
     }
 
     def checkAnswers(data : JsValue)
+                    (pr : Option[Map[String, JsValue]])
                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
             val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
             val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
 
             import inner_traits.mqc
             import inner_traits.sr
@@ -66,7 +70,7 @@ object answerModule extends ModuleTrait {
             val result = left zip right map (x => if (x._1 == x._2) 1 else 0) sum
             val reVal = if (result == left.length) 1 else 0
 
-            (Some(Map("answers_check" -> toJson(reVal))), None)
+            (Some(m ++ Map("answers_check" -> toJson(reVal))), None)
 
         } catch {
             case ex : Exception => println(s"push answer.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
