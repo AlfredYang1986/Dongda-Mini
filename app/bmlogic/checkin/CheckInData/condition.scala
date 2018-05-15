@@ -21,4 +21,10 @@ trait condition {
             case xls : List[DBObject] => $and(xls)
         }
     }
+
+    implicit val mc : JsValue => DBObject = { js =>
+        (js \ "user" \ "user_id").asOpt[String].map { idb =>
+            DBObject("user_id" -> idb)
+        }.getOrElse(DBObject("search" -> "null"))
+    }
 }

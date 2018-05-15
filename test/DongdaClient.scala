@@ -77,12 +77,12 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             }
     }
 
-    def searchProviders ={
+    def searchProviders(wechat_id : String) ={
         ws.url(baseUrl + "/provider/search")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
             .post(toJson(Map(
                 "condition" -> toJson(Map(
-                    "search" -> toJson("condition")
+                    "wechat_id" -> toJson(wechat_id)
                 ))
             )))
             .map { response =>

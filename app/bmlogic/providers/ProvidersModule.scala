@@ -8,7 +8,7 @@ import com.pharbers.ErrorCode
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.dbManagerTrait.dbInstanceManager
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 
 object ProvidersModule extends ModuleTrait {
@@ -16,10 +16,11 @@ object ProvidersModule extends ModuleTrait {
     def dispatchMsg(msg: MessageDefines)(pr: Option[Map[String, JsValue]])(implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_pushProvider(data) => pushProvider(data)
         case msg_popProvider(data) => popProvider(data)
-        case msg_queryProvider(data) => queryProvider(data)
+        case msg_queryProvider(data) => queryProvider(data)(pr)
         case msg_queryProviderMulti(data) => queryProviderMulti(data)
         case msg_queryProviderOne(data) => queryProviderOne(data)(pr)
-        case msg_searchProvider(data) => searchProviders(data)
+        case msg_searchProvider(data) => searchProviders(data)(pr)
+        case msg_mergeCheckedProvider(data) => mergeCheckedProvider(data)(pr)
         case _ => ???
     }
 
@@ -61,18 +62,27 @@ object ProvidersModule extends ModuleTrait {
     }
 
     def queryProvider(data : JsValue)
+                     (pr : Option[Map[String, JsValue]])
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
             val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
             val db = conn.queryDBInstance("cli").get
 
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
             import inner_traits.qc
             import inner_traits.d2m
             val o : DBObject = data
-            val reVal = db.queryObject(o, "providers").map (x => x).getOrElse(Map.empty)
+//            val reVal = db.queryObject(o, "providers").map (x => x).getOrElse(Map.empty)
+//            (Some(Map("provider" -> toJson(reVal))), None)
 
-            (Some(Map("provider" -> toJson(reVal))), None)
+            db.queryObject(o, "providers").map { reVal =>
+                (Some(Map("provider" -> toJson(reVal)) ++ m), None)
+            }.getOrElse(
+                (Some(Map("provider" -> toJson("not exist")) ++ m), None)
+            )
 
         } catch {
             case ex : Exception => println(s"push.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -98,8 +108,6 @@ object ProvidersModule extends ModuleTrait {
             }.getOrElse(
                 (Some(Map("provider" -> toJson("not exist")) ++ m), None)
             )
-//            val reVal = db.queryObject(o, "providers").map (x => x).getOrElse(empty)
-//            (Some(Map("provider" -> toJson(reVal))), None)
 
         } catch {
             case ex : Exception => println(s"push.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -126,18 +134,50 @@ object ProvidersModule extends ModuleTrait {
     }
 
     def searchProviders(data : JsValue)
+                       (pr : Option[Map[String, JsValue]])
                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
             val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
             val db = conn.queryDBInstance("cli").get
 
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
             import inner_traits.asc
             import inner_traits.d2m
-            val o : DBObject = data
+            val o : DBObject = js
             val reVal = db.queryMultipleObject(o, "providers")
 
-            (Some(Map("providers" -> toJson(reVal))), None)
+            (Some(m ++ Map("providers" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => println(s"search provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def mergeCheckedProvider(data : JsValue)
+                            (pr : Option[Map[String, JsValue]])
+                            (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val providers = (js \ "providers").asOpt[List[JsValue]].get
+            val checked_lst = (js \ "checked_lst").asOpt[List[String]].get
+            val providers_up =
+                providers.map { iter =>
+                    val pid = (iter \ "provider_id").asOpt[String].get
+                    val is_checked = toJson(if (checked_lst.contains(pid)) 1 else 0)
+                    toJson(iter.as[JsObject].value.toMap ++ Map("is_checked" -> is_checked))
+                }
+
+            val tmp = m - "user" - "status" - "checked_lst"
+            (Some(tmp ++ Map("providers" -> toJson(providers_up))), None)
 
         } catch {
             case ex : Exception => println(s"search provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))

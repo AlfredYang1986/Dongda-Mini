@@ -24,6 +24,8 @@ trait creation {
         builder += "difference" -> (data \ "difference").asOpt[String].map(x => x).getOrElse("")
         builder += "story" -> (data \ "story").asOpt[String].map(x => x).getOrElse("")
         builder += "description" -> (data \ "description").asOpt[String].map(x => x).getOrElse("")
+        builder += "isPaid" -> (data \ "isPaid").asOpt[Int].map(x => x).getOrElse(0)
+        builder += "festival" -> (data \ "festival").asOpt[String].map (x => x).getOrElse("")
         builder += "date" -> new Date().getTime
 
         builder.result

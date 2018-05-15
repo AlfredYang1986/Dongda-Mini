@@ -19,6 +19,8 @@ trait result {
             "difference" -> toJson(obj.getAs[String]("difference").get),
             "story" -> toJson(obj.getAs[String]("story").get),
             "description" -> toJson(obj.getAs[String]("description").get),
+            "isPaid" -> toJson(obj.getAs[Number]("isPaid").map (x => x.intValue).getOrElse(0)),
+            "festival" -> toJson(obj.getAs[String]("festival").map (x => x).getOrElse("")),
             "date" -> toJson(obj.getAs[Number]("date").get.longValue)
         )
     }
