@@ -138,4 +138,28 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 response.json
             }
     }
+
+    def pushAnswers(push_info : JsValue) = {
+        ws.url(baseUrl + "/answer/push")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(push_info)
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def randomAnswers(wechat_id : String) = {
+        ws.url(baseUrl + "/answer/random")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "condition" -> toJson(Map(
+                    "wechat_id" -> wechat_id
+                ))
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
 }
