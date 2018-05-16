@@ -91,6 +91,21 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             }
     }
 
+    def queryProvider(wechat_id : String, provider_id : String) = {
+        ws.url(baseUrl + "/provider/query")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "condition" -> toJson(Map(
+                    "wechat_id" -> toJson(wechat_id),
+                    "provider_id" -> toJson(provider_id)
+                ))
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
     def checkinWithScores(check_info : JsValue) = {
         ws.url(baseUrl + "/checkin/scores")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")

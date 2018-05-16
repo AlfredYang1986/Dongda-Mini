@@ -35,7 +35,12 @@ class ProvidersController @Inject() (as_inject: ActorSystem, dbt : dbInstanceMan
 
     def queryProvider = Action (request => raq.requestArgs(request) { jv =>
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("query"))), jv)
+            :: msg_queryUser(jv)
+            :: msg_pushUser(jv)
             :: msg_queryProvider(jv)
+            :: msg_userCheckedLst(jv)
+            :: msg_mergeCheckedProviderOne(jv)
+            :: msg_dropUnwantedMessage(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 
@@ -46,6 +51,7 @@ class ProvidersController @Inject() (as_inject: ActorSystem, dbt : dbInstanceMan
             :: msg_searchProvider(jv)
             :: msg_userCheckedLst(jv)
             :: msg_mergeCheckedProvider(jv)
+            :: msg_dropUnwantedMessage(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 }

@@ -147,17 +147,12 @@ object ScoresModule extends ModuleTrait {
 
                 import inner_traits.sc
                 val o: DBObject = js
-//                val reVal =
                     db.queryObject(o, "scores") { obj =>
                         val up: DBObject = inner_traits.ac2d(js, obj)
                         db.updateObject(up, "scores", "_id")
                         import inner_traits.d2m
                         up
                     }
-
-//                (pr, None)
-//            } else {
-//                (pr, None)
             }
 
             (Some(m - "user" - "status"), None)

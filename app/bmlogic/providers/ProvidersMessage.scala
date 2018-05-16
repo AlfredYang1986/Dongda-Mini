@@ -13,4 +13,7 @@ object ProvidersMessage {
     case class msg_queryProviderOne(data : JsValue) extends msg_ProvidersCommand
 
     case class msg_mergeCheckedProvider(data : JsValue) extends msg_ProvidersCommand
+    case class msg_mergeCheckedProviderOne(data : JsValue) extends msg_ProvidersCommand
+
+    case class msg_dropUnwantedMessage(data : JsValue) extends msg_ProvidersCommand
 }

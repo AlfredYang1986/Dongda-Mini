@@ -21,6 +21,8 @@ object ProvidersModule extends ModuleTrait {
         case msg_queryProviderOne(data) => queryProviderOne(data)(pr)
         case msg_searchProvider(data) => searchProviders(data)(pr)
         case msg_mergeCheckedProvider(data) => mergeCheckedProvider(data)(pr)
+        case msg_mergeCheckedProviderOne(data) => mergeCheckedProviderOne(data)(pr)
+        case msg_dropUnwantedMessage(data) => dropUnwantedMessage(data)(pr)
         case _ => ???
     }
 
@@ -176,11 +178,50 @@ object ProvidersModule extends ModuleTrait {
                     toJson(iter.as[JsObject].value.toMap ++ Map("is_checked" -> is_checked))
                 }
 
-            val tmp = m - "user" - "status" - "checked_lst"
-            (Some(tmp ++ Map("providers" -> toJson(providers_up))), None)
+            (Some(m ++ Map("providers" -> toJson(providers_up))), None)
 
         } catch {
             case ex : Exception => println(s"search provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def mergeCheckedProviderOne(data : JsValue)
+                               (pr : Option[Map[String, JsValue]])
+                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val provider = (js \ "provider").asOpt[JsValue].get
+            val checked_lst = (js \ "checked_lst").asOpt[List[String]].get
+
+            val pid = (provider \ "provider_id").asOpt[String].get
+            val is_checked = toJson(if (checked_lst.contains(pid)) 1 else 0)
+            val provider_another = toJson(provider.as[JsObject].value.toMap ++ Map("is_checked" -> is_checked))
+
+            (Some(m ++ Map("provider" -> toJson(provider_another))), None)
+
+        } catch {
+            case ex : Exception => println(s"search provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def dropUnwantedMessage(data : JsValue)
+                           (pr : Option[Map[String, JsValue]])
+                           (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val tmp = m - "user" - "status" - "checked_lst"
+            (Some(tmp), None)
+
+        } catch {
+            case ex : Exception => println(s"drop Unwanted Message .error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

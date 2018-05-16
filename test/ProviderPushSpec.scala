@@ -15,6 +15,8 @@ class ProviderPushSpec extends Specification {
     val time_out = 2 second
     val wechat_id = "oV3gY45JriaqY8EiXruXSHtt4xj0"
     var provider_id = ""
+    val provider_id_1 = "5af54e1410f5c90836f1e682"
+    val provider_id_2 = "5af915b2593c260467a83aac"
 
     lazy val provider_info = toJson(
         Map(
@@ -41,10 +43,12 @@ class ProviderPushSpec extends Specification {
         This is a dongda to check the profile logic string
 
             The 'dongda' provider push application
-                provider search             $searchProviderTest
+                    provider search                     $searchProviderTest
+                    provider query                      $queryProviderTest
                                                                               """
 //    provider push                         $pushProviderTest
 //    provider query              $queryProviderTest
+//    provider search             $searchProviderTest
 
     def pushProviderTest = {
         WsTestClient.withClient { client =>
@@ -67,6 +71,19 @@ class ProviderPushSpec extends Specification {
             val result = (reVal \ "result").asOpt[JsValue].get
             val providers = (result \ "providers").asOpt[List[JsValue]].get
             providers.length must_!= 0
+        }
+    }
+
+    def queryProviderTest = {
+        WsTestClient.withClient { client =>
+            val reVal = Await.result(
+                new DongdaClient(client, "http://127.0.0.1:9000").queryProvider(wechat_id, provider_id_1), time_out)
+
+            println(reVal)
+            val result = (reVal \ "result").asOpt[JsValue].get
+            val provider = (result \ "provider").asOpt[JsValue].get
+
+            (provider \ "provider_id").asOpt[String].get must_== provider_id_1
         }
     }
 }
