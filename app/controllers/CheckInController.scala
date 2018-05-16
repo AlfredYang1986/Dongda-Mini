@@ -1,8 +1,9 @@
 package controllers
 
 import akka.actor.ActorSystem
-import bmlogic.checkin.CheckInMessage.{msg_isChecked, msg_pushCheckIn}
-import bmlogic.providers.ProvidersMessage.msg_queryProviderOne
+import bmlogic.checkin.CheckInMessage.{msg_dropCheckedUnwanted, msg_isChecked, msg_pushCheckIn, msg_userCheckedLst}
+import bmlogic.miniauth.MiniAuthMessage.{msg_dropWXUnwanted, msg_queryWXAuthPara}
+import bmlogic.providers.ProvidersMessage.{msg_dropUnwantedMessage, msg_mergeCheckedProviderOne, msg_queryProviderOne}
 import bmlogic.providerslevel.ProvidersLevelMessage.{msg_pushProvidersLevel, msg_queryProvidersLevel}
 import bmlogic.scroes.ScoresMessage.{msg_addScores, msg_queryScores}
 import bmlogic.user.UserMessage.{msg_pushUser, msg_queryUser}
@@ -34,14 +35,19 @@ class CheckInController @Inject() (as_inject: ActorSystem, dbt : dbInstanceManag
 
     def checkinScores = Action (request => raq.requestArgs(request) { jv =>
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("push"))), jv)
+            :: msg_queryWXAuthPara(jv)
             :: msg_queryUser(jv)
             :: msg_pushUser(jv)
             :: msg_queryProviderOne(jv)
+            :: msg_userCheckedLst(jv)   //
+            :: msg_mergeCheckedProviderOne(jv)  //
             :: msg_isChecked(jv)
             :: msg_pushCheckIn(jv)
             :: msg_queryProvidersLevel(jv)
             :: msg_queryScores(jv)
             :: msg_addScores(jv)
+            :: msg_dropCheckedUnwanted(jv)
+            :: msg_dropWXUnwanted(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 

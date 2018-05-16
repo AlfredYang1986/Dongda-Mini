@@ -1,6 +1,7 @@
 package controllers
 
 import akka.actor.ActorSystem
+import bmlogic.miniauth.MiniAuthMessage.{msg_dropWXUnwanted, msg_queryWXAuthPara}
 import bmlogic.user.UserMessage._
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
@@ -22,7 +23,10 @@ class UserController @Inject() (as_inject: ActorSystem, dbt : dbInstanceManager,
 
     def userLogin = Action (request => raq.requestArgs(request) { jv =>
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("push"))), jv)
-            :: msg_queryUser(jv) :: msg_pushUser(jv)
+            :: msg_queryWXAuthPara(jv)
+            :: msg_queryUser(jv)
+            :: msg_pushUser(jv)
+            :: msg_dropWXUnwanted(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 }

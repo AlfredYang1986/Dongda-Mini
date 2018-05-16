@@ -18,6 +18,7 @@ object CheckInModule extends ModuleTrait {
         case msg_pushCheckIn(data) => pushCheckIn(data)(pr)
         case msg_isChecked(data) => isChecked(data)(pr)
         case msg_userCheckedLst(data) => userCheckedLst(data)(pr)
+        case msg_dropCheckedUnwanted(data) => dropCheckedUnwanted(data)(pr)
         case _ => ???
     }
 
@@ -94,6 +95,21 @@ object CheckInModule extends ModuleTrait {
 
         } catch {
             case ex : Exception => println(s"user checked lst.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def dropCheckedUnwanted(data : JsValue)
+                           (pr : Option[Map[String, JsValue]])
+                           (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val tmp = m - "user" - "status" - "checked_lst" - "is_check" - "level"
+            (Some(tmp), None)
+
+
+        } catch {
+            case ex : Exception => println(s"drop unwanted.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

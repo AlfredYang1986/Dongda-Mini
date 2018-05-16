@@ -9,4 +9,6 @@ object CheckInMessage {
     case class msg_pushCheckIn(data : JsValue) extends msg_CheckInCommand
     case class msg_isChecked(data : JsValue) extends msg_CheckInCommand
     case class msg_userCheckedLst(data : JsValue) extends msg_CheckInCommand
+
+    case class msg_dropCheckedUnwanted(data : JsValue) extends msg_CheckInCommand
 }
