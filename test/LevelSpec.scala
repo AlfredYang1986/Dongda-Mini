@@ -19,7 +19,8 @@
 //        Map(
 //            "level" -> toJson(Map(
 //                "provider_id" -> toJson("5af54e1410f5c90836f1e682"),
-//                "ll" -> toJson("scores_B"),
+//                "ll" -> toJson("scores_D"),
+//                "is_collected" -> toJson(1),
 //                "sd" -> toJson(1526227200000L),
 //                "ed" -> toJson(1526572800000L)
 //            ))
@@ -30,14 +31,14 @@
 //        This is a dongda to check the profile logic string
 //
 //            The 'dongda' push level
-//                query level                          $queryLevelTest
+//                push level                          $pushLevelTest
 //                                                                              """
-////    push level                          $pushLevelTest
+////    query level                          $queryLevelTest
 //
 //    def pushLevelTest = {
 //        WsTestClient.withClient { client =>
 //            val reVal = Await.result(
-//                new DongdaClient(client, "http://127.0.0.1:9000").pushLevel(level_info), time_out)
+//                new DongdaClient(client, "http://127.0.0.1:9999").pushLevel(level_info), time_out)
 //
 //            val result = (reVal \ "result").asOpt[JsValue].get
 //

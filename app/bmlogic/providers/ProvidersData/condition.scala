@@ -13,6 +13,7 @@ trait condition {
 
     implicit val mc : JsValue => DBObject = { js =>
         val lst = (js \ "condition" \ "providers").asOpt[List[String]].get
+        println(lst)
         lst match {
             case Nil => DBObject("search" -> "null")
             case xls : List[String] => $or(xls map (x => DBObject("_id" -> new ObjectId(x))))

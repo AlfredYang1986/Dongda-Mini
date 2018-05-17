@@ -8,4 +8,6 @@ abstract class msg_ProvidersLevelCommand extends CommonMessage(cat ="providers",
 object ProvidersLevelMessage {
     case class msg_pushProvidersLevel(data : JsValue) extends msg_ProvidersLevelCommand
     case class msg_queryProvidersLevel(data : JsValue) extends msg_ProvidersLevelCommand
+
+    case class msg_queryCollectedProviders(data : JsValue) extends msg_ProvidersLevelCommand
 }

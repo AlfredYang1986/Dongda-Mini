@@ -3,6 +3,7 @@ package controllers
 import akka.actor.ActorSystem
 import bmlogic.checkin.CheckInMessage.msg_userCheckedLst
 import bmlogic.providers.ProvidersMessage._
+import bmlogic.providerslevel.ProvidersLevelMessage.msg_queryCollectedProviders
 import bmlogic.user.UserMessage.{msg_pushUser, msg_queryUser}
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
@@ -49,6 +50,18 @@ class ProvidersController @Inject() (as_inject: ActorSystem, dbt : dbInstanceMan
             :: msg_queryUser(jv)
             :: msg_pushUser(jv)
             :: msg_searchProvider(jv)
+            :: msg_userCheckedLst(jv)
+            :: msg_mergeCheckedProvider(jv)
+            :: msg_dropUnwantedMessage(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
+
+    def collectedProviders = Action (request => raq.requestArgs(request) { jv =>
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("collected"))), jv)
+            :: msg_queryUser(jv)
+            :: msg_pushUser(jv)
+            :: msg_queryCollectedProviders(jv)
+            :: msg_queryProviderMulti(jv)
             :: msg_userCheckedLst(jv)
             :: msg_mergeCheckedProvider(jv)
             :: msg_dropUnwantedMessage(jv)

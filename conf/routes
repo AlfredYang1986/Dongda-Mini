@@ -18,6 +18,8 @@ POST     /level/query                            controllers.CheckInController.q
 POST     /provider/search                        controllers.ProvidersController.searchProviders
 POST     /provider/query                         controllers.ProvidersController.queryProvider
 
+POST     /provider/collection                    controllers.ProvidersController.collectedProviders
+
 POST     /answer/push                            controllers.AnswerController.pushAnswers
 POST     /answer/random                          controllers.AnswerController.randomAnswers
 POST     /answer/check                           controllers.AnswerController.checkAnswers

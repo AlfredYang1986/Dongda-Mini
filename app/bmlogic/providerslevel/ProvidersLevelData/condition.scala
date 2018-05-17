@@ -21,4 +21,12 @@ trait condition {
 
         $and(("sd" $lte date) :: ("ed" $gte date) :: builder.result :: Nil)
     }
+
+    implicit val spc : JsValue => DBObject = { js =>
+
+        val date = new Date().getTime
+        val builder = MongoDBObject.newBuilder
+        builder += "is_collected" -> 1
+        $and(("sd" $lte date) :: ("ed" $gte date) :: builder.result :: Nil)
+    }
 }
