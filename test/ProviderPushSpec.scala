@@ -43,10 +43,10 @@ class ProviderPushSpec extends Specification {
         This is a dongda to check the profile logic string
 
             The 'dongda' provider push application
-                provider search             $searchProviderTest
+                provider query              $queryProviderTest
                                                                               """
 //    provider push               $pushProviderTest
-//    provider query              $queryProviderTest
+//    provider search             $searchProviderTest
 //    provider collections                $queryCollectedProviderTest
 
     def pushProviderTest = {
@@ -76,7 +76,7 @@ class ProviderPushSpec extends Specification {
     def queryProviderTest = {
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9000").queryProvider(wechat_id, provider_id_1), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").queryProvider(wechat_id, "5afc18295c3b0913cbc10d95"), time_out)
 
             println(reVal)
             val result = (reVal \ "result").asOpt[JsValue].get

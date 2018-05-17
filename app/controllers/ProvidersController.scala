@@ -3,7 +3,7 @@ package controllers
 import akka.actor.ActorSystem
 import bmlogic.checkin.CheckInMessage.msg_userCheckedLst
 import bmlogic.providers.ProvidersMessage._
-import bmlogic.providerslevel.ProvidersLevelMessage.msg_queryCollectedProviders
+import bmlogic.providerslevel.ProvidersLevelMessage.{msg_queryCollectedProviders, msg_queryTopProviders}
 import bmlogic.user.UserMessage.{msg_pushUser, msg_queryUser}
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
@@ -41,6 +41,8 @@ class ProvidersController @Inject() (as_inject: ActorSystem, dbt : dbInstanceMan
             :: msg_queryProvider(jv)
             :: msg_userCheckedLst(jv)
             :: msg_mergeCheckedProviderOne(jv)
+            :: msg_queryTopProviders(jv)
+            :: msg_mergeTopProviderOne(jv)
             :: msg_dropUnwantedMessage(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
@@ -52,6 +54,8 @@ class ProvidersController @Inject() (as_inject: ActorSystem, dbt : dbInstanceMan
             :: msg_searchProvider(jv)
             :: msg_userCheckedLst(jv)
             :: msg_mergeCheckedProvider(jv)
+            :: msg_queryTopProviders(jv)
+            :: msg_mergeTopProvider(jv)
             :: msg_dropUnwantedMessage(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
@@ -64,6 +68,8 @@ class ProvidersController @Inject() (as_inject: ActorSystem, dbt : dbInstanceMan
             :: msg_queryProviderMulti(jv)
             :: msg_userCheckedLst(jv)
             :: msg_mergeCheckedProvider(jv)
+            :: msg_queryTopProviders(jv)
+            :: msg_mergeTopProvider(jv)
             :: msg_dropUnwantedMessage(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })

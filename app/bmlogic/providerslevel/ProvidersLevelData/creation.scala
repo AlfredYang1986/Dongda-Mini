@@ -15,6 +15,7 @@ trait creation {
         builder += "provider_id" -> (data \ "provider_id").asOpt[String].get
         builder += "ll" -> (data \ "ll").asOpt[String].get
         builder += "is_collected" -> (data \ "is_collected").asOpt[Int].get
+        builder += "is_top" -> (data \ "is_top").asOpt[Int].get
         builder += "sd" -> (data \ "sd").asOpt[Long].get
         builder += "ed" -> (data \ "ed").asOpt[Long].get
         builder += "date" -> new Date().getTime

@@ -23,6 +23,9 @@ object ProvidersModule extends ModuleTrait {
         case msg_mergeCheckedProvider(data) => mergeCheckedProvider(data)(pr)
         case msg_mergeCheckedProviderOne(data) => mergeCheckedProviderOne(data)(pr)
         case msg_dropUnwantedMessage(data) => dropUnwantedMessage(data)(pr)
+
+        case msg_mergeTopProvider(data) => mergeTopProviders(data)(pr)
+        case msg_mergeTopProviderOne(data) => mergeTopProvidersOne(data)(pr)
         case _ => ???
     }
 
@@ -167,9 +170,6 @@ object ProvidersModule extends ModuleTrait {
                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
-            val db = conn.queryDBInstance("cli").get
-
             val js = MergeStepResult(data, pr)
             val m = pr.map (x => x).getOrElse(Map.empty)
 
@@ -194,9 +194,6 @@ object ProvidersModule extends ModuleTrait {
                                (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
-            val db = conn.queryDBInstance("cli").get
-
             val js = MergeStepResult(data, pr)
             val m = pr.map (x => x).getOrElse(Map.empty)
 
@@ -226,6 +223,52 @@ object ProvidersModule extends ModuleTrait {
 
         } catch {
             case ex : Exception => println(s"drop Unwanted Message .error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def mergeTopProviders(data :JsValue)
+                               (pr : Option[Map[String, JsValue]])
+                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val providers = (js \ "providers").asOpt[List[JsValue]].get
+            val top_lst = (js \ "condition" \ "providers").asOpt[List[String]].get
+            val providers_up =
+                providers.map { iter =>
+                    val pid = (iter \ "provider_id").asOpt[String].get
+                    val is_top = toJson(if (top_lst.contains(pid)) 1 else 0)
+                    toJson(iter.as[JsObject].value.toMap ++ Map("is_top" -> is_top))
+                }
+
+            (Some(m ++ Map("providers" -> toJson(providers_up))), None)
+
+        } catch {
+            case ex : Exception => println(s"search provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def mergeTopProvidersOne(data :JsValue)
+                               (pr : Option[Map[String, JsValue]])
+                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val provider = (js \ "provider").asOpt[JsValue].get
+            val col_lst = (js \ "condition" \ "providers").asOpt[List[String]].get
+
+            val pid = (provider \ "provider_id").asOpt[String].get
+            val is_top = toJson(if (col_lst.contains(pid)) 1 else 0)
+            val provider_another = toJson(provider.as[JsObject].value.toMap ++ Map("is_top" -> is_top))
+
+            (Some(m ++ Map("provider" -> toJson(provider_another))), None)
+
+        } catch {
+            case ex : Exception => println(s"merge collected one.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }
