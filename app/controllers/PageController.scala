@@ -13,4 +13,8 @@ class PageController @Inject() extends Controller {
     def activity(provider_id : String) = Action {
         Ok(views.html.activity(provider_id))
     }
+
+    def questions = Action {
+        Ok(views.html.question())
+    }
 }
