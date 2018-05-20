@@ -117,17 +117,21 @@ $(document).ready(function(){
                 title: a3
             }
         } else {
-            answer3 = {}
+            answer3 = {
+                index: 3,
+                image: "",
+                title: ""
+            }
         }
         var right = $('input[name="right"]:checked').val()-0;
         var random = $('#random').val()-0;
         var data = {
-            anwser : {
+            answer : {
                 description : question,
                 choice:[
                     {
                         index: 1,
-                        iamge: "",
+                        image: "",
                         title: a1
                     },
                     {
@@ -140,7 +144,7 @@ $(document).ready(function(){
                 answer: right,
             }
         }
-        // console.log(data);
+        console.log(data);
         $.ajax({
             method: "POST",
             url:'/answer/push',
@@ -151,7 +155,12 @@ $(document).ready(function(){
             Accpt: "application/json,charset=utf-8",
             success: function(res){
                 
-                console.log(res)
+                console.log(res);
+                if(res.status=== "ok") {
+                    alert('添加成功')
+                }else {
+                    alert("error")
+                }
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 console.log(XMLHttpRequest,textStatus,errorThrown)
