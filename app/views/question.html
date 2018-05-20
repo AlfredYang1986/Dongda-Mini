@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>题目信息填写</title>
+    <link href="https://cdn.bootcss.com/bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <form class="form-horizontal">
+        <fieldset>
+          <div id="legend" class="">
+            <legend class="">题目上传页面</legend>
+          </div>
+        <div class="control-group">
+    
+              <!-- Text input-->
+              <label class="control-label" for="input01">题目题干</label>
+              <div class="controls">
+                <input id="question" type="text" placeholder="字符串" class="input-xlarge">
+                <p class="help-block">题干</p>
+              </div>
+            </div>
+    
+        <div class="control-group">
+    
+              <!-- Text input-->
+              <label class="control-label" for="input01">第一个选项</label>
+              <div class="controls">
+                <input id="a1" type="text" placeholder="第一个选项" class="input-xlarge">
+                <p class="help-block">第一个选项</p>
+              </div>
+            </div>
+    
+        <div class="control-group">
+    
+              <!-- Text input-->
+              <label class="control-label" for="input01">第二个选项</label>
+              <div class="controls">
+                <input id="a2" type="text" placeholder="第二个选项" class="input-xlarge">
+                <p class="help-block">第二个选项</p>
+              </div>
+            </div>
+    
+        <div class="control-group">
+    
+              <!-- Text input-->
+              <label class="control-label" for="input01">第三个选项</label>
+              <div class="controls">
+                <input id="a3" type="text" placeholder="第三个选项" class="input-xlarge">
+                <p class="help-block">第三个选项</p>
+              </div>
+            </div>
+    
+        <div class="control-group">
+              <label class="control-label">正确答案</label>
+              <div class="controls">
+          <!-- Inline Radios -->
+          <label class="radio inline">
+            <input type="radio" value="1" name="right" checked="checked">
+            1
+          </label>
+          <label class="radio inline">
+            <input type="radio" value="2" name="right">
+            2
+          </label>
+          <label class="radio inline">
+            <input type="radio" value="3" name="right">
+            3
+          </label>
+      </div>
+            </div>
+    
+        <div class="control-group">
+    
+              <!-- Text input-->
+              <label class="control-label" for="input01">随机取样的标示</label>
+              <div class="controls">
+                <input id="random" type="text" placeholder="数字" class="input-xlarge">
+                <p class="help-block">随机取样的标示</p>
+              </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">点击提交</label>
+      
+                <!-- Button -->
+                <div class="controls">
+                  <button id="submit" class="btn btn-success">提交</button>
+                </div>
+              </div>
+        </fieldset>
+      </form>
+    
+</body>
+<script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.js"></script>
+
+<script src="https://cdn.bootcss.com/bootstrap/2.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script>
+
+$(document).ready(function(){
+    $("#submit").click(function(e){       
+        e.preventDefault();
+        var question  = $('#question').val();
+        var a1 = $('#a1').val();
+        var a2 = $('#a2').val();
+        var a3 = $('#a3').val();
+        if(a3 !== "") {
+            var answer3= {
+                index: 3,
+                image: "",
+                title: a3
+            }
+        } else {
+            answer3 = {}
+        }
+        var right = $('input[name="right"]:checked').val()-0;
+        var random = $('#random').val()-0;
+        var data = {
+            anwser : {
+                description : question,
+                choice:[
+                    {
+                        index: 1,
+                        iamge: "",
+                        title: a1
+                    },
+                    {
+                        index: 2,
+                        image: "",
+                        title: a2,
+                    },answer3
+                ],
+                random: random,
+                answer: right,
+            }
+        }
+        // console.log(data);
+        $.ajax({
+            method: "POST",
+            url:'/answer/push',
+            dataType: 'json',
+            cache: false,
+            data: JSON.stringify(data),
+            contentType: "application/json,charset=utf-8",
+            Accpt: "application/json,charset=utf-8",
+            success: function(res){
+                
+                console.log(res)
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest,textStatus,errorThrown)
+            }
+        })
+        
+    })
+});
+
+
+</script>
+
+</html>
