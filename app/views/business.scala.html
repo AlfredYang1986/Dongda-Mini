@@ -11,11 +11,10 @@
 </head>
 
 <body>
-    <input type="text" id="brand_name" value="test">
     <form class="form-horizontal">
         <fieldset>
             <div id="legend" class="">
-                <legend class="">表单名</legend>
+                <legend class="">商家信息填写</legend>
             </div>
 
             <div class="control-group">
@@ -93,7 +92,13 @@
                     <p class="help-block">随意字符</p>
                 </div>
             </div>
-
+            <div class="control-group">
+                <label class="control-label" for="input01">与众不同的点</label>
+                <div class="controls">
+                    <input id="difference" type="text" placeholder="逗号隔开" class="input-xlarge">
+                    <p class="help-block">随意字符</p>
+                </div>
+            </div>
             <div class="control-group">
 
                 <label class="control-label">初心故事</label>
@@ -105,74 +110,95 @@
             </div>
 
 
-            <div class="control-group">
-                <label class="control-label">适应年龄</label>
-                <div class="controls">
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="1">2岁以下
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="2">2~6岁
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="3">6~8岁
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="4">8~12岁
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="5">其他
-                    </label>
-                </div>
+            @*<div class="control-group">*@
+                @*<label class="control-label">适应年龄</label>*@
+                @*<div class="controls">*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="1">2岁以下*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="2">2~6岁*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="3">6~8岁*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="4">8~12岁*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="5">其他*@
+                    @*</label>*@
+                @*</div>*@
 
-            </div>
+            @*</div>*@
 
             <div class="control-group">
 
                 <label class="control-label">活动描述</label>
                 <div class="controls">
                     <div class="textarea">
-                        <textarea id="descript" type="" class=""> </textarea>
+                        <textarea id="description" type="" class=""> </textarea>
                     </div>
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label">服务时间</label>
-
+                <label class="control-label">是否为星耀商家</label>
                 <div class="controls">
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="1"> 1日
+                    <label class="radio inline">
+                        <input type="radio" value="0" checked="checked" name="isPaid">否
                     </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="2"> 2日
+                    <label class="radio inline">
+                        <input type="radio" value="1" name="isPaid">是
                     </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="3"> 3日
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="3"> 4日
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="3"> 5日
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="3"> 6日
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="3"> 7日
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="3"> 8日
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="3"> 9日
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" value="3"> 10日
-                    </label>
-                </div>
 
+                </div>
             </div>
+            <div class="control-group">
+
+                <label class="control-label">六一活动特殊描述</label>
+                <div class="controls">
+                    <div class="textarea">
+                        <textarea id="festival" type="text" class=""> </textarea>
+                    </div>
+                </div>
+            </div>
+            @*<div class="control-group">*@
+                @*<label class="control-label">服务时间</label>*@
+
+                @*<div class="controls">*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="1"> 1日*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="2"> 2日*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="3"> 3日*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="3"> 4日*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="3"> 5日*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="3"> 6日*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="3"> 7日*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="3"> 8日*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="3"> 9日*@
+                    @*</label>*@
+                    @*<label class="checkbox inline">*@
+                        @*<input type="checkbox" value="3"> 10日*@
+                    @*</label>*@
+                @*</div>*@
+
+            @*</div>*@
 
         </fieldset>
     </form>
@@ -186,9 +212,12 @@
 <script>
 
 $(document).ready(function(){
+    function setCookie(value) {
+        document.cookie=id+ "=" +value;
+    }
     $("#submit").click(function(e){
         e.preventDefault();
-        // console.log($('input[name="type"]:checked').val());
+        console.log($('input[name="type"]:checked').val());
         var brand_name = $('#brand_name').val();
         var short_name = $('#short_name').val();
         var address = $('#address').val();
@@ -196,12 +225,12 @@ $(document).ready(function(){
         var service_leaf = $('#leaf').val();
         var found_date = $('#found_date').val();
         var onepunchline = $('#onepunchline').val();
-        var difference = $('#difference').val();
+        var difference = $('#difference').val().split('，');
         var story = $('#story').val();
         var description = $('#description').val();
-        var isPaid = $('#isPaid').val();
+        var isPaid = $('input[name="isPaid"]:checked').val() - 0;
         var festival = $('#festival').val();
-        
+
         var data = {
             provider : {
                 brand_name : brand_name,
@@ -212,14 +241,15 @@ $(document).ready(function(){
                 logo : "",
                 found_date : found_date,
                 onepunchline : onepunchline,
-                difference : [],
+                difference : difference,
                 story : story,
                 description : description,
-                isPaid : 0,
+                isPaid : isPaid,
                 festival : festival,
             }
         }
-
+        // console.log(data);
+        // console.log(JSON.stringify(data));
         $.ajax({
             method: "POST",
             url:'/provider/push',
@@ -229,13 +259,19 @@ $(document).ready(function(){
             contentType: "application/json,charset=utf-8",
             Accpt: "application/json,charset=utf-8",
             success: function(res){
-              console.log(res)
+              console.log(res);
+              if(res.status === "ok") {
+                  document.cookie="id=" +res.result.provider_id+";path=/";
+                  window.open('/activityinfo')
+              } else {
+                  alert('写不进去，重写');
+              }
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 console.log(XMLHttpRequest,textStatus,errorThrown)
             }
         })
-        
+
     })
 });
 

@@ -25,4 +25,5 @@ trait condition {
             case xls : List[Int] => $or(xls map (x => DBObject("random" -> x)))
         }
     }
+
 }

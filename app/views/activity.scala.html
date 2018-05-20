@@ -1,3 +1,5 @@
+@(provider_id : String)
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -109,7 +111,8 @@ $(document).ready(function(){
         // $.cookie('the_cookie', 'the_value', { expires: 7, path: '/' });
         // $.cookie('cookieName', 'cookieValue');    
         // document.cookie="username=John Doe";
-        var id=$.cookie('id');
+        // var id=$.cookie('id');
+        var id = '@{provider_id}'
         console.log(id)
         var sd= new Date("2018"+sd_m_d).getTime();
         var ed = new Date("2018"+ed_m_d).getTime();
