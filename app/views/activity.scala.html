@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>信息填写</title>
+    <title>运营信息填写</title>
     <link href="https://cdn.bootcss.com/bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet">
 
 </head>
@@ -15,86 +15,88 @@
 <body>
     <form class="form-horizontal">
         <fieldset>
-          <div id="legend" class="">
-            <legend class="">运营信息</legend>
-          </div>
-        <div class="control-group">
-    
-              <!-- Text input-->
-              <label class="control-label" for="input01">开始时间</label>
-              <div class="controls">
-                <input id="sd" type="text" placeholder="0601" class="input-xlarge">
-                <p class="help-block">字符串</p>
-              </div>
+            <div id="legend" class="">
+                <legend class="">运营信息</legend>
             </div>
-    
-        <div class="control-group">
-    
-              <!-- Text input-->
-              <label class="control-label" for="input01">结束时间</label>
-              <div class="controls">
-                <input id="ed" type="text" placeholder="0602" class="input-xlarge">
-                <p class="help-block">字符串</p>
-              </div>
+            <div class="control-group">
+
+                <!-- Text input-->
+                <label class="control-label" for="input01">开始时间</label>
+                <div class="controls">
+                    <input id="sd" type="text" placeholder="06010800" class="input-xlarge">
+                    <p class="help-block">月份06日期05小时08分钟30</p>
+                </div>
             </div>
-    
-        <div class="control-group">
-              <label class="control-label">扫码得哪个蛋</label>
-              <div class="controls">
-          <!-- Inline Radios -->
-          <label class="radio inline">
-            <input type="radio" value="scores_A" name="eggtype" checked="checked">
-            经典蛋
-          </label>
-          <label class="radio inline">
-            <input type="radio" value="scores_D" name="eggtype">
-            王者蛋
-          </label>
-      </div>
+
+            <div class="control-group">
+                <!-- Text input-->
+                <label class="control-label" for="input01">结束时间</label>
+                <div class="controls">
+                    <input id="ed" type="text" placeholder="06021000" class="input-xlarge">
+                    <p class="help-block">月份日期小时分钟</p>
+                </div>
             </div>
-    
-        <div class="control-group">
-              <label class="control-label">是否被选为今日提供的特殊活动</label>
-              <div class="controls">
-          <!-- Inline Radios -->
-          <label class="radio inline">
-            <input type="radio" value=0 name="collection" checked="checked">
-            否
-          </label>
-          <label class="radio inline">
-            <input type="radio" value=1 name="collection">
-            是
-          </label>
-      </div>
+
+            <div class="control-group">
+                <!-- Text input-->
+                <label class="control-label" for="inputage">适应年龄</label>
+                <div class="controls">
+                    <input id="age" type="text" placeholder="5-6" class="input-xlarge">
+                    <p class="help-block">开始年龄结束年龄</p>
+                </div>
             </div>
-    
-        <div class="control-group">
-              <label class="control-label">在这段时间内，改场地服务是否被选为王者场地</label>
-              <div class="controls">
-          <!-- Inline Radios -->
-          <label class="radio inline">
-            <input type="radio" value=0 name="is_top" checked="checked">
-            否
-          </label>
-          <label class="radio inline">
-            <input type="radio" value=1 name="is_top">
-            是
-          </label>
-      </div>
+
+            <div class="control-group">
+                <label class="control-label">扫码得哪个蛋</label>
+                <div class="controls">
+                    <!-- Inline Radios -->
+                    <label class="radio inline">
+                        <input type="radio" value="scores_A" name="eggtype" checked="checked"> 经典蛋
+                    </label>
+                    <label class="radio inline">
+                        <input type="radio" value="scores_D" name="eggtype"> 王者蛋
+                    </label>
+                </div>
             </div>
-    
-        <div class="control-group">
-    
-              <!-- Text input-->
-              <label class="control-label" for="input01">score</label>
-              <div class="controls">
-                <input id="scores" type="text" placeholder="数字" class="input-xlarge">
-                <p class="help-block">这个影响在固定搜索后的排序</p>
-              </div>
+
+            <div class="control-group">
+                <label class="control-label">是否被选为今日提供的特殊活动</label>
+                <div class="controls">
+                    <!-- Inline Radios -->
+                    <label class="radio inline">
+                        <input type="radio" value=0 name="collection" checked="checked"> 否
+                    </label>
+                    <label class="radio inline">
+                        <input type="radio" value=1 name="collection"> 是
+                    </label>
+                </div>
             </div>
-    
+
+            <div class="control-group">
+                <label class="control-label">在这段时间内，改场地服务是否被选为王者场地</label>
+                <div class="controls">
+                    <!-- Inline Radios -->
+                    <label class="radio inline">
+                        <input type="radio" value=0 name="is_top" checked="checked"> 否
+                    </label>
+                    <label class="radio inline">
+                        <input type="radio" value=1 name="is_top"> 是
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+
+                <!-- Text input-->
+                <label class="control-label" for="input01">score</label>
+                <div class="controls">
+                    <input id="scores" type="text" placeholder="数字" class="input-xlarge">
+                    <p class="help-block">这个影响在固定搜索后的排序</p>
+                </div>
+            </div>
+
         </fieldset>
-      </form>
+    </form>
     <button type="button" class="btn btn-success" id="submit">提交</button>
 </body>
 <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.js"></script>
@@ -103,58 +105,62 @@
 <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script>
 
-$(document).ready(function(){
-    $("#submit").click(function(e){
-    var sd_m_d=$('#sd').val().slice(0,2)+","+$('#sd').val().slice(2);  
-    var ed_m_d=$('#ed').val().slice(0,2)+","+$('#sd').val().slice(2);         
-        e.preventDefault();
-        // $.cookie('the_cookie', 'the_value', { expires: 7, path: '/' });
-        // $.cookie('cookieName', 'cookieValue');    
-        // document.cookie="username=John Doe";
-        // var id=$.cookie('id');
-        var id = '@{provider_id}'
-        console.log(id)
-        var sd= new Date("2018"+sd_m_d).getTime();
-        var ed = new Date("2018"+ed_m_d).getTime();
-        var eggtype = $('input[name="eggtype"]:checked').val();
-        var is_collection = $('input[name="collection"]:checked').val()-0;
-        var is_top = $('input[name="is_top"]:checked').val()-0;
-        var scores = $('#scores').val()-0;
-        var data = {
-            level : {
-                provider_id : id,
-                sd : sd,
-                ed : ed,
-                ll : eggtype,
-                is_collected : is_collection,
-                is_top : is_top,
-                scores: scores,
-            }
-        }
-        console.log(data);
-        $.ajax({
-            method: "POST",
-            url:'/level/push',
-            dataType: 'json',
-            cache: false,
-            data: JSON.stringify(data),
-            contentType: "application/json,charset=utf-8",
-            Accpt: "application/json,charset=utf-8",
-            success: function(res){
-                console.log(res);
-                if(res.status === "ok") {
-                    alert("添加成功")
-                }else {
-                    alert("出现错误")
+    $(document).ready(function () {
+        $("#submit").click(function (e) {
+            var sd_m_d = $('#sd').val().slice(0, 2) + "," + $('#sd').val().slice(2, 4) + " " + $('#sd').val().slice(4, 6) + ":" + $('#sd').val().slice(6);
+            var ed_m_d = $('#ed').val().slice(0, 2) + "," + $('#sd').val().slice(2, 4) + " " + $('#ed').val().slice(4, 6) + ":" + $('#ed').val().slice(6);
+            // var sd_m_d=$('#sd').val().slice(0,2)+","+$('#sd').val().slice(2);  
+            // var ed_m_d=$('#ed').val().slice(0,2)+","+$('#sd').val().slice(2);         
+            e.preventDefault();
+            // $.cookie('the_cookie', 'the_value', { expires: 7, path: '/' });
+            // $.cookie('cookieName', 'cookieValue');    
+            // document.cookie="username=John Doe";
+            // var id=$.cookie('id');
+            var id = '@{provider_id}'
+            console.log(id)
+            var sd = new Date("2018" + sd_m_d).getTime();
+            var ed = new Date("2018" + ed_m_d).getTime();
+            var eggtype = $('input[name="eggtype"]:checked').val();
+            var is_collection = $('input[name="collection"]:checked').val() - 0;
+            var is_top = $('input[name="is_top"]:checked').val() - 0;
+            var scores = $('#scores').val() - 0;
+            var age = $('#age').val();
+            var data = {
+                level: {
+                    provider_id: id,
+                    sd: sd,
+                    ed: ed,
+                    ll: eggtype,
+                    is_collected: is_collection,
+                    is_top: is_top,
+                    scores: scores,
+                    age: age,
                 }
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                console.log(XMLHttpRequest,textStatus,errorThrown)
             }
+            console.log(data);
+            $.ajax({
+                method: "POST",
+                url: '/level/push',
+                dataType: 'json',
+                cache: false,
+                data: JSON.stringify(data),
+                contentType: "application/json,charset=utf-8",
+                Accpt: "application/json,charset=utf-8",
+                success: function (res) {
+                    console.log(res);
+                    if (res.status === "ok") {
+                        alert("添加成功")
+                    } else {
+                        alert("出现错误")
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(XMLHttpRequest, textStatus, errorThrown)
+                }
+            })
+
         })
-        
-    })
-});
+    });
 
 
 </script>

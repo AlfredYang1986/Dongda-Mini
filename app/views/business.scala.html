@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>信息填写</title>
+    <title>商家信息填写</title>
     <link href="https://cdn.bootcss.com/bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet">
 
 </head>
@@ -85,6 +85,16 @@
                     <p class="help-block">随意字符</p>
                 </div>
             </div>
+
+            <div class="control-group">
+                <!-- Text input-->
+                <label class="control-label" for="inputage">适应年龄</label>
+                <div class="controls">
+                  <input id="age" type="text" placeholder="5-6，8-10" class="input-xlarge">
+                  <p class="help-block">开始年龄结束年龄</p>
+                </div>
+            </div>
+
             <div class="control-group">
                 <label class="control-label" for="input01">一句话介绍</label>
                 <div class="controls">
@@ -109,29 +119,6 @@
                 </div>
             </div>
 
-
-            @*<div class="control-group">*@
-                @*<label class="control-label">适应年龄</label>*@
-                @*<div class="controls">*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="1">2岁以下*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="2">2~6岁*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="3">6~8岁*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="4">8~12岁*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="5">其他*@
-                    @*</label>*@
-                @*</div>*@
-
-            @*</div>*@
-
             <div class="control-group">
 
                 <label class="control-label">活动描述</label>
@@ -154,6 +141,27 @@
                 </div>
             </div>
             <div class="control-group">
+                <label class="control-label">是否预约</label>
+                <div class="controls">
+                    <!-- Inline Radios -->
+                    <label class="radio inline">
+                        <input type="radio" value="0" name="appointment" checked="checked"> 否
+                    </label>
+                    <label class="radio inline">
+                        <input type="radio" value="1" name="appointment"> 是
+                    </label>
+                </div>
+            </div>
+            <div class="control-group">
+
+                <label class="control-label">其他</label>
+                <div class="controls">
+                    <div class="textarea">
+                        <textarea id="other" type="text" class=""> </textarea>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="control-group">
 
                 <label class="control-label">六一活动特殊描述</label>
                 <div class="controls">
@@ -161,44 +169,7 @@
                         <textarea id="festival" type="text" class=""> </textarea>
                     </div>
                 </div>
-            </div>
-            @*<div class="control-group">*@
-                @*<label class="control-label">服务时间</label>*@
-
-                @*<div class="controls">*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="1"> 1日*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="2"> 2日*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="3"> 3日*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="3"> 4日*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="3"> 5日*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="3"> 6日*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="3"> 7日*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="3"> 8日*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="3"> 9日*@
-                    @*</label>*@
-                    @*<label class="checkbox inline">*@
-                        @*<input type="checkbox" value="3"> 10日*@
-                    @*</label>*@
-                @*</div>*@
-
-            @*</div>*@
+            </div> -->
 
         </fieldset>
     </form>
@@ -212,9 +183,9 @@
 <script>
 
 $(document).ready(function(){
-    function setCookie(value) {
-        document.cookie=id+ "=" +value;
-    }
+    // function setCookie(value) {
+    //     document.cookie=id+ "=" +value;
+    // }
     $("#submit").click(function(e){
         e.preventDefault();
         console.log($('input[name="type"]:checked').val());
@@ -229,10 +200,13 @@ $(document).ready(function(){
         var story = $('#story').val();
         var description = $('#description').val();
         var isPaid = $('input[name="isPaid"]:checked').val() - 0;
-        var festival = $('#festival').val();
-
+        var appointment = $('input[name="appointment"]:checked').val() -0;
+        // var festival = $('#festival').val();
+        var other = $('#other').val();
+        var age = $('#age').val().split('，');
         var data = {
             provider : {
+                age: age,
                 brand_name : brand_name,
                 short_name : short_name,
                 address : address,
@@ -245,10 +219,11 @@ $(document).ready(function(){
                 story : story,
                 description : description,
                 isPaid : isPaid,
-                festival : festival,
+                other : other,
+                need_appointment: appointment,
             }
         }
-        // console.log(data);
+        console.log(data);
         // console.log(JSON.stringify(data));
         $.ajax({
             method: "POST",
