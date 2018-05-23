@@ -140,10 +140,9 @@
 
                 </div>
             </div>
-            <div class="control-group">
+            <!-- <div class="control-group">
                 <label class="control-label">是否预约</label>
                 <div class="controls">
-                    <!-- Inline Radios -->
                     <label class="radio inline">
                         <input type="radio" value="0" name="appointment" checked="checked"> 否
                     </label>
@@ -151,7 +150,7 @@
                         <input type="radio" value="1" name="appointment"> 是
                     </label>
                 </div>
-            </div>
+            </div> -->
             <div class="control-group">
 
                 <label class="control-label">其他</label>
@@ -200,10 +199,11 @@ $(document).ready(function(){
         var story = $('#story').val();
         var description = $('#description').val();
         var isPaid = $('input[name="isPaid"]:checked').val() - 0;
-        var appointment = $('input[name="appointment"]:checked').val() -0;
+        // var appointment = $('input[name="appointment"]:checked').val() -0;
         // var festival = $('#festival').val();
         var other = $('#other').val();
         var age = $('#age').val().split(/[,|，|\s]/);
+        
         var data = {
             provider : {
                 age: age,
@@ -220,7 +220,7 @@ $(document).ready(function(){
                 description : description,
                 isPaid : isPaid,
                 other : other,
-                need_appointment: appointment,
+                // need_appointment: appointment,
             }
         }
         console.log(data);
