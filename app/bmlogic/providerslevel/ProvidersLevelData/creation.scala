@@ -18,6 +18,8 @@ trait creation {
         builder += "is_top" -> (data \ "is_top").asOpt[Int].get
         builder += "sd" -> (data \ "sd").asOpt[Long].get
         builder += "ed" -> (data \ "ed").asOpt[Long].get
+        builder += "ssd" -> (data \ "sd").asOpt[Long].get
+        builder += "sed" -> (data \ "ed").asOpt[Long].get
         builder += "age" -> (data \ "age").asOpt[String].get
         builder += "date" -> new Date().getTime
 

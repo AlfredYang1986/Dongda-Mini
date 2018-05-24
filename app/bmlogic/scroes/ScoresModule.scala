@@ -193,6 +193,7 @@ object ScoresModule extends ModuleTrait {
                         val o: DBObject = js
                         val reVal =
                             db.queryObject(o, "scores") { obj =>
+//                                val up: DBObject = inner_traits.ab2d(js, obj)
                                 val up: DBObject = inner_traits.mb2d(js, obj)
                                 db.updateObject(up, "scores", "_id")
                                 import inner_traits.d2m
