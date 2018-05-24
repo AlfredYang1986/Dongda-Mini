@@ -1,7 +1,7 @@
 package controllers
 
 import akka.actor.ActorSystem
-import bmlogic.answer.answerMessage.{msg_checkAnswers, msg_pushAnswer, msg_randomAnswers, msg_randomGenerator}
+import bmlogic.answer.answerMessage._
 import bmlogic.scroes.ScoresMessage.{msg_postAnswerScores, msg_preAnswerScores, msg_queryScores}
 import bmlogic.user.UserMessage.{msg_pushUser, msg_queryUser}
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
@@ -43,6 +43,21 @@ class AnswerController @Inject() (as_inject: ActorSystem, dbt : dbInstanceManage
             :: msg_queryUser(jv)
             :: msg_pushUser(jv)
             :: msg_checkAnswers(jv)
+//            :: msg_postAnswerScores(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
+
+    def resetAnswers = Action (request => raq.requestArgs(request) { jv =>
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push"))), jv)
+            :: msg_resetRandomIndex(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
+
+    def successAnswers = Action (request => raq.requestArgs(request) { jv =>
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push"))), jv)
+            :: msg_queryUser(jv)
+            :: msg_pushUser(jv)
+//            :: msg_checkAnswers(jv)
             :: msg_postAnswerScores(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })

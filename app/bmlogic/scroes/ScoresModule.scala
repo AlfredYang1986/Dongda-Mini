@@ -11,6 +11,8 @@ import com.pharbers.dbManagerTrait.dbInstanceManager
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 
+import scala.util.Random
+
 object ScoresModule extends ModuleTrait {
 
     def dispatchMsg(msg: MessageDefines)(pr: Option[Map[String, JsValue]])(implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
@@ -18,6 +20,7 @@ object ScoresModule extends ModuleTrait {
         case msg_queryScores(data) => queryScores(data)(pr)
         case msg_preAnswerScores(data) => preAnswerScores(data)(pr)
         case msg_postAnswerScores(data) => postAnswerScores(data)(pr)
+        case msg_postCheckInScores(data) => postCheckInScores(data)(pr)
     }
 
     object inner_traits extends creation with condition with result
@@ -159,6 +162,51 @@ object ScoresModule extends ModuleTrait {
 
         } catch {
             case ex : Exception => println(s"pre answer scores.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def postCheckInScores(data : JsValue)
+                         (pr : Option[Map[String, JsValue]])
+                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val hc =
+                if ((js \ "check_in").asOpt[String].map (x => x == "already checked").getOrElse(false)) 0
+                else {
+                    val possibility =
+                        (js \ "level").asOpt[String].map (x => x).getOrElse("scores_A") match {
+                            case "scores_A" => 5
+                            case "scores_D" => 8
+                        }
+
+                    def has_coins(p : Int) = if (Random.nextInt(10) < p) 1 else 0
+
+                    val tmp = has_coins(possibility)
+                    if (tmp == 1) {
+                        import inner_traits.qc
+                        val o: DBObject = js
+                        val reVal =
+                            db.queryObject(o, "scores") { obj =>
+                                val up: DBObject = inner_traits.mb2d(js, obj)
+                                db.updateObject(up, "scores", "_id")
+                                import inner_traits.d2m
+                                up
+                            }
+                    }
+
+                    tmp
+                }
+
+            (Some(m ++ Map("has_coins" -> toJson(hc))), None)
+
+        } catch {
+            case ex : Exception => println(s"post check in scores.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

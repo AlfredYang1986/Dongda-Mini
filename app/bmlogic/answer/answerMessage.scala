@@ -10,4 +10,6 @@ object answerMessage {
     case class msg_randomAnswers(data : JsValue) extends msg_AnswerCommand
     case class msg_checkAnswers(data : JsValue) extends msg_AnswerCommand
     case class msg_randomGenerator(data : JsValue) extends msg_AnswerCommand
+
+    case class msg_resetRandomIndex(data : JsValue) extends msg_AnswerCommand
 }

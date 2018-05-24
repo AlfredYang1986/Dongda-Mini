@@ -104,7 +104,7 @@ object CheckInModule extends ModuleTrait {
         try {
             val m = pr.map (x => x).getOrElse(Map.empty)
 
-            val tmp = m - "user" - "status" - "checked_lst" - "is_check" - "level"
+            val tmp = m - "user" - "status" - "checked_lst" - "is_check" // - "level"
             (Some(tmp), None)
 
 

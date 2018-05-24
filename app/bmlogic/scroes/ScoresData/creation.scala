@@ -73,6 +73,15 @@ trait creation {
         obj
     }
 
+    implicit val ab2d : (JsValue, DBObject) => DBObject = { (js, obj) =>
+        val data = js
+        assert(obj.getAs[String]("user_id").get == (data \ "user" \ "user_id").asOpt[String].get)
+
+        val tmp_B = obj.getAs[Number]("scores_B").get.intValue + 1
+        obj += "scores_B" -> tmp_B.asInstanceOf[Number]
+        obj
+    }
+
     implicit val ac2d : (JsValue, DBObject) => DBObject = { (js, obj) =>
         val data = js
         assert(obj.getAs[String]("user_id").get == (data \ "user" \ "user_id").asOpt[String].get)
