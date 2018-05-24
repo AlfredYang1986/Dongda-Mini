@@ -19,9 +19,7 @@
                 <legend class="">运营信息</legend>
             </div>
             <div class="control-group">
-
-                <!-- Text input-->
-                <label class="control-label" for="input01">开始时间</label>
+                <label class="control-label" for="sd">活动开始时间</label>
                 <div class="controls">
                     <input id="sd" type="text" placeholder="06010800" class="input-xlarge">
                     <p class="help-block">月份06日期05小时08分钟30</p>
@@ -29,8 +27,7 @@
             </div>
 
             <div class="control-group">
-                <!-- Text input-->
-                <label class="control-label" for="input01">结束时间</label>
+                <label class="control-label" for="ed">活动结束时间</label>
                 <div class="controls">
                     <input id="ed" type="text" placeholder="06021000" class="input-xlarge">
                     <p class="help-block">月份日期小时分钟</p>
@@ -38,7 +35,22 @@
             </div>
 
             <div class="control-group">
-                <!-- Text input-->
+                <label class="control-label" for="s_sd">活动搜索开始时间</label>
+                <div class="controls">
+                    <input id="s_sd" type="text" placeholder="05310800" class="input-xlarge">
+                    <p class="help-block">月份日期小时分钟</p>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="s_ed">活动搜索结束时间</label>
+                <div class="controls">
+                    <input id="s_ed" type="text" placeholder="06021020" class="input-xlarge">
+                    <p class="help-block">月份日期小时分钟</p>
+                </div>
+            </div>
+
+            <div class="control-group">
                 <label class="control-label" for="inputage">适应年龄</label>
                 <div class="controls">
                     <input id="age" type="text" placeholder="5-6" class="input-xlarge">
@@ -49,7 +61,6 @@
             <div class="control-group">
                 <label class="control-label">扫码得哪个蛋</label>
                 <div class="controls">
-                    <!-- Inline Radios -->
                     <label class="radio inline">
                         <input type="radio" value="scores_A" name="eggtype" checked="checked"> 经典蛋
                     </label>
@@ -62,7 +73,6 @@
             <div class="control-group">
                 <label class="control-label">是否被选为今日提供的特殊活动</label>
                 <div class="controls">
-                    <!-- Inline Radios -->
                     <label class="radio inline">
                         <input type="radio" value=0 name="collection" checked="checked"> 否
                     </label>
@@ -75,7 +85,6 @@
             <div class="control-group">
                 <label class="control-label">在这段时间内，改场地服务是否被选为王者场地</label>
                 <div class="controls">
-                    <!-- Inline Radios -->
                     <label class="radio inline">
                         <input type="radio" value=0 name="is_top" checked="checked"> 否
                     </label>
@@ -86,8 +95,6 @@
             </div>
 
             <div class="control-group">
-
-                <!-- Text input-->
                 <label class="control-label" for="input01">score</label>
                 <div class="controls">
                     <input id="scores" type="text" placeholder="数字" class="input-xlarge">
@@ -108,9 +115,10 @@
     $(document).ready(function () {
         $("#submit").click(function (e) {
             var sd_m_d = $('#sd').val().slice(0, 2) + "," + $('#sd').val().slice(2, 4) + " " + $('#sd').val().slice(4, 6) + ":" + $('#sd').val().slice(6);
-            var ed_m_d = $('#ed').val().slice(0, 2) + "," + $('#sd').val().slice(2, 4) + " " + $('#ed').val().slice(4, 6) + ":" + $('#ed').val().slice(6);
-            // var sd_m_d=$('#sd').val().slice(0,2)+","+$('#sd').val().slice(2);  
-            // var ed_m_d=$('#ed').val().slice(0,2)+","+$('#sd').val().slice(2);         
+            var ed_m_d = $('#ed').val().slice(0, 2) + "," + $('#ed').val().slice(2, 4) + " " + $('#ed').val().slice(4, 6) + ":" + $('#ed').val().slice(6);
+
+            var s_sd = $('#s_sd').val().slice(0, 2) + "," + $('#s_sd').val().slice(2, 4) + " " + $('#s_sd').val().slice(4, 6) + ":" + $('#s_sd').val().slice(6);
+            var s_ed = $('#s_ed').val().slice(0, 2) + "," + $('#s_ed').val().slice(2, 4) + " " + $('#s_ed').val().slice(4, 6) + ":" + $('#s_ed').val().slice(6);
             e.preventDefault();
             // $.cookie('the_cookie', 'the_value', { expires: 7, path: '/' });
             // $.cookie('cookieName', 'cookieValue');    
@@ -120,6 +128,9 @@
             console.log(id)
             var sd = new Date("2018," + sd_m_d).getTime();
             var ed = new Date("2018," + ed_m_d).getTime();
+
+            var ssd = new Date("2018," + s_sd).getTime();
+            var sed = new Date("2018," + s_ed).getTime();
             var eggtype = $('input[name="eggtype"]:checked').val();
             var is_collection = $('input[name="collection"]:checked').val() - 0;
             var is_top = $('input[name="is_top"]:checked').val() - 0;
@@ -135,6 +146,8 @@
                     is_top: is_top,
                     scores: scores,
                     age: age,
+                    ssd: ssd,
+                    sed: sed,
                 }
             }
             console.log(data);
