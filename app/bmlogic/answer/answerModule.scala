@@ -110,13 +110,13 @@ object answerModule extends ModuleTrait {
             val js = MergeStepResult(data, pr)
             val m = pr.map (x => x).getOrElse(Map.empty)
 
-            if ((js \ "answer opp").asOpt[Int].map(x => x == 1).getOrElse(false)) {
+//            if ((js \ "answer opp").asOpt[Int].map(x => x == 1).getOrElse(false)) {
                 val a = randomNew(5)
                 (Some(m ++ Map("random" -> toJson(a))), None)
-            } else {
-                val a : List[Int] = Nil
-                (Some(m ++ Map("random" -> toJson(a))), None)
-            }
+//            } else {
+//                val a : List[Int] = Nil
+//                (Some(m ++ Map("random" -> toJson(a))), None)
+//            }
 
         } catch {
             case ex : Exception => println(s"random generator error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -126,10 +126,11 @@ object answerModule extends ModuleTrait {
     def randomNew(n : Int) = {
         var resultList : List[Int] = Nil
         while (resultList.length < n) {
-            val randomNum = Random.nextInt(9)
-            if(!resultList.exists (s => s == randomNum)){
+//            val randomNum = Random.nextInt(9)
+            val randomNum = 1 //Random.nextInt(9)
+//            if(!resultList.exists (s => s == randomNum)){
                 resultList=resultList ::: List(randomNum)
-            }
+//            }
         }
         resultList
     }

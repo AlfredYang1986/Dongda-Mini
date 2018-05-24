@@ -11,6 +11,16 @@ trait condition {
         DBObject("_id" -> new ObjectId(id))
     }
 
+    implicit val msc : JsValue => DBObject = { js =>
+//        val date = new Date().getTime
+        val providers = (js \ "condition" \ "providers").asOpt[List[String]].get
+
+        providers match {
+            case Nil => DBObject("search" -> "null")
+            case xls : List[String] => $or(xls map (x => DBObject("provider_id" -> x)))
+        }
+    }
+
     implicit val sc : JsValue => DBObject = { js =>
 
         val date = new Date().getTime
