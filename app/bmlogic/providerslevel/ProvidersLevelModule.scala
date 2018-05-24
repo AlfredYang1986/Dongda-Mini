@@ -18,6 +18,8 @@ object ProvidersLevelModule extends ModuleTrait {
         case msg_queryProvidersLevel(data) => queryProviderLevel(data)(pr)
         case msg_queryCollectedProviders(data) => queryCollectedProviders(data)(pr)
         case msg_queryTopProviders(data) => queryTopProviders(data)(pr)
+        case msg_queryDisplayAges(data) => queryDisplayAges(data)(pr)
+        case msg_mergeDisplayAges(data) => mergeDisplayAges(data)(pr)
         case _ => ???
     }
 
@@ -114,6 +116,58 @@ object ProvidersLevelModule extends ModuleTrait {
 
         } catch {
             case ex : Exception => println(s"query top.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def queryDisplayAges(data : JsValue)
+                        (pr : Option[Map[String, JsValue]])
+                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+//            val condition = (js \ "condition").asOpt[JsValue].map (x => x).getOrElse(toJson(Map("wx" -> toJson("code"))))
+
+            import inner_traits.msc
+            import inner_traits.colr
+            val o : DBObject = js
+            val reVal = db.queryMultipleObject(o, "levels")
+
+            (Some(m ++ Map("providers_ages" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => println(s"query display age.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def mergeDisplayAges(data : JsValue)
+                        (pr : Option[Map[String, JsValue]])
+                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val provider_ages = (js \ "providers_ages").asOpt[List[JsValue]].get
+            val providers = (js \ "providers").asOpt[List[JsValue]].get
+
+            val provider_new =
+                providers.map { iter =>
+                    val m_iter = iter.as[JsObject].value.toMap
+                    val tmp = provider_ages.find(p =>
+                        (p \ "provider_id").asOpt[String].get == (iter \ "provider_id").asOpt[String].get).get
+                    toJson(m_iter ++ Map("age" -> toJson((tmp \ "age").asOpt[String].get)))
+                }
+
+            val tmp = m - "provider_ages"
+            (Some(tmp ++ Map("providers" -> toJson(provider_new))), None)
+
+        } catch {
+            case ex : Exception => println(s"merge display age.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

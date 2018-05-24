@@ -237,7 +237,8 @@ $(document).ready(function(){
               console.log(res);
               if(res.status === "ok") {
                   document.cookie="id=" +res.result.provider_id+";path=/";
-                  window.open('/page/activity/'+res.result.provider_id)
+                  window.open('/page/activity/'+res.result.provider_id);
+
               } else {
                   alert('写不进去，重写');
               }
