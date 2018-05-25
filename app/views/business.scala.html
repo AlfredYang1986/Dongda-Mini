@@ -195,15 +195,18 @@ $(document).ready(function(){
         var service_leaf = $('#leaf').val();
         var found_date = $('#found_date').val();
         var onepunchline = $('#onepunchline').val();
-        var difference = $('#difference').val().split(/[,|，|\s]/);
+        var newDifference = $('#difference').val().trim();
+        var difference = newDifference.split(/[,|，|\s]/);
+
         var story = $('#story').val();
         var description = $('#description').val();
         var isPaid = $('input[name="isPaid"]:checked').val() - 0;
         // var appointment = $('input[name="appointment"]:checked').val() -0;
         // var festival = $('#festival').val();
         var other = $('#other').val();
-        var age = $('#age').val().split(/[,|，|\s]/);
-        
+        var newage = $('#age').val().trim();
+        var age =newage.split(/[,|，|\s]/);
+
         var data = {
             provider : {
                 age: age,
