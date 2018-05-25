@@ -24,6 +24,9 @@ POST     /answer/push                            controllers.AnswerController.pu
 POST     /answer/random                          controllers.AnswerController.randomAnswers
 #POST     /answer/next                            controllers.AnswerController.randomAnswers
 POST     /answer/check                           controllers.AnswerController.checkAnswers
+POST     /answer/success                         controllers.AnswerController.successAnswers
+
+POST     /answer/reset                           controllers.AnswerController.resetAnswers
 
 GET      /page/business                          controllers.PageController.business
 GET      /page/activity/:id                      controllers.PageController.activity(id)

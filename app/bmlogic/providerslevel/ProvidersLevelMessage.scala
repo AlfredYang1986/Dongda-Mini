@@ -14,4 +14,7 @@ object ProvidersLevelMessage {
 
     case class msg_queryDisplayAges(data : JsValue) extends msg_ProvidersLevelCommand
     case class msg_mergeDisplayAges(data : JsValue) extends msg_ProvidersLevelCommand
+
+    case class msg_queryServiceDate(data : JsValue) extends msg_ProvidersLevelCommand
+    case class msg_mergeServiceDate(data : JsValue) extends msg_ProvidersLevelCommand
 }

@@ -32,6 +32,16 @@ trait condition {
         $and(("sd" $lte date) :: ("ed" $gte date) :: builder.result :: Nil)
     }
 
+    implicit val soc : JsValue => DBObject = { js =>
+
+        val provider_id = (js \ "condition" \ "provider_id").asOpt[String].map (x => x).getOrElse ((js \ "provider" \ "provider_id").asOpt[String].get)
+
+        val builder = MongoDBObject.newBuilder
+        builder += "provider_id" -> provider_id
+
+        builder.result
+    }
+
     implicit val spc : JsValue => DBObject = { js =>
 
         val date = new Date().getTime

@@ -9,7 +9,7 @@ import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.dbManagerTrait.dbInstanceManager
 import org.bson.types.ObjectId
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 
 import scala.util.Random
@@ -21,6 +21,7 @@ object answerModule extends ModuleTrait {
         case msg_checkAnswers(data) => checkAnswers(data)(pr)
         case msg_randomAnswers(data) => randomAnswers(data)(pr)
         case msg_randomGenerator(data) => randomGenerator(data)(pr)
+        case msg_resetRandomIndex(data) => resetRandomIndex(data)
         case _ => ???
     }
 
@@ -106,12 +107,18 @@ object answerModule extends ModuleTrait {
                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            import inner_traits.sr
+            val count = db.queryCount(DBObject(), "answers").get
+            println(count)
 
             val js = MergeStepResult(data, pr)
             val m = pr.map (x => x).getOrElse(Map.empty)
 
 //            if ((js \ "answer opp").asOpt[Int].map(x => x == 1).getOrElse(false)) {
-                val a = randomNew(5)
+                val a = randomNew(5, count)
                 (Some(m ++ Map("random" -> toJson(a))), None)
 //            } else {
 //                val a : List[Int] = Nil
@@ -123,15 +130,42 @@ object answerModule extends ModuleTrait {
         }
     }
 
-    def randomNew(n : Int) = {
+    def randomNew(n : Int, base : Int) = {
         var resultList : List[Int] = Nil
         while (resultList.length < n) {
-//            val randomNum = Random.nextInt(9)
-            val randomNum = 1 //Random.nextInt(9)
-//            if(!resultList.exists (s => s == randomNum)){
-                resultList=resultList ::: List(randomNum)
-//            }
+            val randomNum = Random.nextInt(base)
+//            val randomNum = 1 //Random.nextInt(9)
+            if(!resultList.exists (s => s == randomNum)){
+                resultList = resultList ::: List(randomNum)
+            }
         }
         resultList
+    }
+
+    def resetRandomIndex(data : JsValue)
+                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            import inner_traits.sr
+            val count = db.queryCount(DBObject(), "answers").get
+            println(count)
+
+            var random_index = 0
+            val tmp =
+                db.queryMultipleObject(DBObject(), "answers", skip = 0, take = count) { iter =>
+                    iter += "random" -> random_index.asInstanceOf[Number]
+                    random_index = random_index + 1
+                    db.updateObject(iter, "answers", "_id")
+
+                    Map("reset" -> toJson("random"))
+                }
+
+            (Some(Map("count" -> toJson(count))), None)
+        } catch {
+            case ex : Exception => println(s"reset random index error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
     }
 }
