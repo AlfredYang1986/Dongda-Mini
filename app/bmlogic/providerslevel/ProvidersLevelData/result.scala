@@ -20,4 +20,13 @@ trait result {
             "is_collected" -> toJson(obj.getAs[Number]("is_collected").get.intValue)
         )
     }
+
+    implicit val tr : DBObject => Map[String, JsValue] = { obj =>
+        Map (
+            "level_id" -> toJson(obj.getAs[ObjectId]("_id").get.toString),
+            "provider_id" -> toJson(obj.getAs[String]("provider_id").get),
+            "ssd" -> toJson(obj.getAs[Number]("ssd").map (x => x.longValue).getOrElse(0L)),
+            "sed" -> toJson(obj.getAs[Number]("sed").map (x => x.longValue).getOrElse(0L))
+        )
+    }
 }

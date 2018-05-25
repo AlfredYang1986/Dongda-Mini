@@ -1,5 +1,7 @@
 package bmlogic.providerslevel
 
+import java.util.{Calendar, Date, GregorianCalendar}
+
 import bmlogic.common.mergestepresult.MergeStepResult
 import bmlogic.providerslevel.ProvidersLevelData._
 import bmlogic.providerslevel.ProvidersLevelMessage._
@@ -20,6 +22,8 @@ object ProvidersLevelModule extends ModuleTrait {
         case msg_queryTopProviders(data) => queryTopProviders(data)(pr)
         case msg_queryDisplayAges(data) => queryDisplayAges(data)(pr)
         case msg_mergeDisplayAges(data) => mergeDisplayAges(data)(pr)
+        case msg_queryServiceDate(data) => queryServiceDate(data)(pr)
+        case msg_mergeServiceDate(data) => mergeServiceDate(data)(pr)
         case _ => ???
     }
 
@@ -165,6 +169,67 @@ object ProvidersLevelModule extends ModuleTrait {
 
             val tmp = m - "provider_ages"
             (Some(tmp ++ Map("providers" -> toJson(provider_new))), None)
+
+        } catch {
+            case ex : Exception => println(s"merge display age.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def queryServiceDate(data : JsValue)
+                        (pr : Option[Map[String, JsValue]])
+                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+            // val condition = (js \ "condition").asOpt[JsValue].map (x => x).getOrElse(toJson(Map("wx" -> toJson("code"))))
+
+            import inner_traits.soc
+            import inner_traits.tr
+            val o : DBObject = js
+            val reVal = db.queryMultipleObject(o, "levels").map { iter =>
+                val ssd : Calendar = new GregorianCalendar()
+                ssd.setTime(new Date(iter.get("ssd").get.asOpt[Long].get))
+                val ssd_month = ssd.get(Calendar.MONTH) + 1
+                val ssd_day = ssd.get(Calendar.DAY_OF_MONTH)
+
+                val sed : Calendar = new GregorianCalendar()
+                sed.setTime(new Date(iter.get("sed").get.asOpt[Long].get))
+                val sed_month = sed.get(Calendar.MONTH) + 1
+                val sed_day = sed.get(Calendar.DAY_OF_MONTH)
+
+                (ssd_month, ssd_day) :: (sed_month, sed_day) :: Nil
+            }.flatten.groupBy(_._1).map (x => (x._1, x._2.map (y => y._2)))
+                .map { iter =>
+                    Map("month" -> toJson(iter._1), "days" -> toJson(iter._2.distinct.sorted))
+                }.toList.sortBy(p => p.get("month").get.asOpt[Int].get)
+
+            (Some(m ++ Map("server_time" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => println(s"query service date.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def mergeServiceDate(data : JsValue)
+                        (pr : Option[Map[String, JsValue]])
+                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val server_time = (js \ "server_time").asOpt[JsValue].get
+            val provider = (js \ "provider").asOpt[JsValue].get
+
+            val pm = provider.as[JsObject].value.toMap
+
+            val tmp = m - "server_time"
+            (Some(tmp ++ Map("provider" -> toJson(pm ++ Map("server_time" -> server_time)))), None)
 
         } catch {
             case ex : Exception => println(s"merge display age.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))

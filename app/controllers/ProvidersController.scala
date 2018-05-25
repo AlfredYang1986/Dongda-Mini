@@ -3,7 +3,7 @@ package controllers
 import akka.actor.ActorSystem
 import bmlogic.checkin.CheckInMessage.msg_userCheckedLst
 import bmlogic.providers.ProvidersMessage._
-import bmlogic.providerslevel.ProvidersLevelMessage.{msg_mergeDisplayAges, msg_queryCollectedProviders, msg_queryDisplayAges, msg_queryTopProviders}
+import bmlogic.providerslevel.ProvidersLevelMessage._
 import bmlogic.user.UserMessage.{msg_pushUser, msg_queryUser}
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
@@ -43,6 +43,8 @@ class ProvidersController @Inject() (as_inject: ActorSystem, dbt : dbInstanceMan
             :: msg_mergeCheckedProviderOne(jv)
             :: msg_queryTopProviders(jv)
             :: msg_mergeTopProviderOne(jv)
+            :: msg_queryServiceDate(jv)
+            :: msg_mergeServiceDate(jv)
             :: msg_dropUnwantedMessage(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
