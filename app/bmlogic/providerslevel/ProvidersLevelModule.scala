@@ -24,6 +24,7 @@ object ProvidersLevelModule extends ModuleTrait {
         case msg_mergeDisplayAges(data) => mergeDisplayAges(data)(pr)
         case msg_queryServiceDate(data) => queryServiceDate(data)(pr)
         case msg_mergeServiceDate(data) => mergeServiceDate(data)(pr)
+        case msg_resetLevels(data) => resetLevels(data)
         case _ => ???
     }
 
@@ -233,6 +234,38 @@ object ProvidersLevelModule extends ModuleTrait {
 
         } catch {
             case ex : Exception => println(s"merge display age.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def resetLevels(data : JsValue)
+                   (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val count =
+            {
+                import inner_traits.tr
+                db.queryCount(DBObject(), "levels").get
+            }
+            db.queryMultipleObject(DBObject(), "levels", skip = 0, take = count) { iter =>
+                val provider_id = iter.getAs[String]("provider_id").get
+                val tmp =
+                    db.queryObject(DBObject("_id" -> new ObjectId(provider_id)), "providers") { iter =>
+                        Map("provider_id" -> toJson(iter.getAs[ObjectId]("_id").get.toString))
+                    }
+                tmp match {
+                    case None => Map("_id" -> toJson(iter.getAs[ObjectId]("_id").get.toString))
+                    case Some(x) => println(x); Map("_id" -> toJson(""))
+                }
+            }.map (x => x.get("_id").get.asOpt[String].get).distinct.filterNot(_ == "").foreach { unwanted =>
+                db.deleteObject(DBObject("_id" -> new ObjectId(unwanted)), "levels", "_id")
+            }
+
+            (Some(Map("reset" -> toJson("success"))), None)
+
+        } catch {
+            case ex : Exception => println(s"reset levels.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

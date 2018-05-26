@@ -47,12 +47,6 @@ class AnswerController @Inject() (as_inject: ActorSystem, dbt : dbInstanceManage
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 
-    def resetAnswers = Action (request => raq.requestArgs(request) { jv =>
-        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push"))), jv)
-            :: msg_resetRandomIndex(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
-    })
-
     def successAnswers = Action (request => raq.requestArgs(request) { jv =>
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("push"))), jv)
             :: msg_queryUser(jv)

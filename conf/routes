@@ -26,7 +26,8 @@ POST     /answer/random                          controllers.AnswerController.ra
 POST     /answer/check                           controllers.AnswerController.checkAnswers
 POST     /answer/success                         controllers.AnswerController.successAnswers
 
-POST     /answer/reset                           controllers.AnswerController.resetAnswers
+POST     /answer/reset                           controllers.CleanController.resetAnswers
+POST     /levels/reset                           controllers.CleanController.resetLevels
 
 GET      /page/business                          controllers.PageController.business
 GET      /page/activity/:id                      controllers.PageController.activity(id)
