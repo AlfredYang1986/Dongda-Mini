@@ -1,9 +1,14 @@
 package bmlogic.providers
 
+import java.io.{File, FileInputStream, FileOutputStream}
+import java.util.UUID
+
 import bmlogic.common.mergestepresult.MergeStepResult
 import bmlogic.providers.ProvidersData._
 import bmlogic.providers.ProvidersMessage._
+import com.mongodb.BasicDBObject
 import com.mongodb.casbah.Imports.{DBObject, ObjectId}
+import com.mongodb.casbah.commons.MongoDBObject
 import com.pharbers.ErrorCode
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
@@ -26,10 +31,14 @@ object ProvidersModule extends ModuleTrait {
 
         case msg_mergeTopProvider(data) => mergeTopProviders(data)(pr)
         case msg_mergeTopProviderOne(data) => mergeTopProvidersOne(data)(pr)
+
+        case msg_resetProviderLogo(data) => resetProviderLogo(data)
         case _ => ???
     }
 
     object inner_traits extends creation with condition with result
+    val logo_path = "logo/"
+    val dst = "images/"
 
     def pushProvider(data : JsValue)
                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
@@ -269,6 +278,69 @@ object ProvidersModule extends ModuleTrait {
 
         } catch {
             case ex : Exception => println(s"merge collected one.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def resetProviderLogo(data : JsValue)
+                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+
+            val count =
+            {
+                import inner_traits.d2m
+                db.queryCount(DBObject(), "providers").get
+            }
+
+            db.queryMultipleObject(DBObject(), "providers", skip = 0, take = count) { iter =>
+                val brand_name = iter.get("brand_name").asInstanceOf[String]
+                val short_name = iter.get("short_name").asInstanceOf[String]
+                println(brand_name + "-----------" + short_name)
+                Map("a" -> toJson(short_name))
+            }.map (x => x.get("a").get.asOpt[String].get).distinct.foreach { name =>
+                val (_, uuid) = copyFiles(name, logo_path + name + ".jpg")
+                db.queryMultipleObject(DBObject("short_name" -> name), "providers") { iter =>
+                    if (iter.get("logo").asInstanceOf[String] == "") {
+                        val tmp = iter.asInstanceOf[BasicDBObject]
+                        tmp.append("logo", uuid)
+                        println(tmp)
+                        db.updateObject(tmp.asInstanceOf[DBObject], "providers", "_id")
+                    }
+
+                    Map("he" -> toJson("he"))
+                }
+            }
+
+//            (Some(m ++ Map("providers" -> toJson(reVal))), None)
+            (Some(Map("reset" -> toJson("success"))), None)
+
+        } catch {
+            case ex : Exception => println(s"search provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def copyFiles(name : String, source : String) : (String, String) = {
+        try {
+            val image_uuid = UUID.randomUUID().toString
+            val tar = new File(dst, image_uuid)
+            val is = new FileInputStream(source)
+
+            val os = new FileOutputStream(tar)
+            val buf = new Array[Byte](1024)
+            var len = is.read(buf)
+            while (len != -1) {
+                os.write(buf, 0, len)
+                len = is.read(buf)
+            }
+            is.close()
+            os.close()
+
+            (name, image_uuid)
+        } catch {
+            case _ : Exception => (name, "")
         }
     }
 }

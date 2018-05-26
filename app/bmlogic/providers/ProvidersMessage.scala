@@ -19,4 +19,6 @@ object ProvidersMessage {
     case class msg_mergeTopProviderOne(data : JsValue) extends msg_ProvidersCommand
 
     case class msg_dropUnwantedMessage(data : JsValue) extends msg_ProvidersCommand
+
+    case class msg_resetProviderLogo(data : JsValue) extends msg_ProvidersCommand
 }
