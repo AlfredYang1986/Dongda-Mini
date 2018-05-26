@@ -2,4 +2,5 @@ logs/
 project/target/
 target
 .idea
-
+images/
+logo/

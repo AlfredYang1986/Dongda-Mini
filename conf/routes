@@ -29,6 +29,7 @@ POST     /answer/success                         controllers.AnswerController.su
 POST     /answer/reset                           controllers.CleanController.resetAnswers
 POST     /levels/reset                           controllers.CleanController.resetLevels
 POST     /logo/reset                             controllers.CleanController.resetLogo
+POST     /address/reset                          controllers.CleanController.resetPin
 
 GET      /page/business                          controllers.PageController.business
 GET      /page/activity/:id                      controllers.PageController.activity(id)

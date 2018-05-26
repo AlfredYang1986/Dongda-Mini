@@ -32,8 +32,24 @@ trait condition {
     }
 
     implicit val asc : JsValue => DBObject = { js =>
-//        val con = (js \ "condition").asOpt[JsValue].get
-        val builder = MongoDBObject.newBuilder
-        builder.result
+        val sc =
+            (js \ "condition" \ "pin").asOpt[JsValue].map { pin =>
+                val lat = (pin \ "latitude").asOpt[Float].map(x => x).getOrElse(throw new Exception("search service input error"))
+                val log = (pin \ "longitude").asOpt[Float].map(x => x).getOrElse(throw new Exception("search service input error"))
+                val tmp = MongoDBObject(
+                    "pin" -> MongoDBObject(
+                        "$nearSphere" -> MongoDBObject(
+                            "type" -> "Point",
+                            "coordinates" -> MongoDBList(log, lat)
+                        ),
+                        "$maxDistance" -> 5000))
+                Some(tmp)
+            }.getOrElse(None)
+
+        sc match {
+            case None => DBObject()
+            case Some(x) => x
+        }
+//        DBObject()
     }
 }

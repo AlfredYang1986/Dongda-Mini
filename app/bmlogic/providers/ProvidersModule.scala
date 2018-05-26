@@ -13,6 +13,7 @@ import com.pharbers.ErrorCode
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.dbManagerTrait.dbInstanceManager
+import com.pharbers.http.HTTP
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 
@@ -33,6 +34,7 @@ object ProvidersModule extends ModuleTrait {
         case msg_mergeTopProviderOne(data) => mergeTopProvidersOne(data)(pr)
 
         case msg_resetProviderLogo(data) => resetProviderLogo(data)
+        case msg_resetLocationPin(data) => resetLocationPin(data)
         case _ => ???
     }
 
@@ -303,12 +305,12 @@ object ProvidersModule extends ModuleTrait {
             }.map (x => x.get("a").get.asOpt[String].get).distinct.foreach { name =>
                 val (_, uuid) = copyFiles(name, logo_path + name + ".jpg")
                 db.queryMultipleObject(DBObject("short_name" -> name), "providers") { iter =>
-                    if (iter.get("logo").asInstanceOf[String] == "") {
+//                    if (iter.get("logo").asInstanceOf[String] == "") {
                         val tmp = iter.asInstanceOf[BasicDBObject]
                         tmp.append("logo", uuid)
                         println(tmp)
                         db.updateObject(tmp.asInstanceOf[DBObject], "providers", "_id")
-                    }
+//                    }
 
                     Map("he" -> toJson("he"))
                 }
@@ -341,6 +343,53 @@ object ProvidersModule extends ModuleTrait {
             (name, image_uuid)
         } catch {
             case _ : Exception => (name, "")
+        }
+    }
+
+    def resetLocationPin(data : JsValue)
+                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+
+            val count =
+            {
+                import inner_traits.d2m
+                db.queryCount(DBObject(), "providers").get
+            }
+
+            db.queryMultipleObject(DBObject(), "providers", skip = 0, take = count) { iter =>
+                val address = iter.get("address").asInstanceOf[String]
+                val s = address.indexOf("：")
+                val e = address.indexOf("（")
+                val sa = if (address.isEmpty) ""
+                         else address.substring(if (s > - 1) s + 1 else 0, if (e > -1) e else address.length)
+
+                if (!sa.isEmpty) {
+                    val loc_result = HTTP(s"http://restapi.amap.com/v3/geocode/geo?key=6bcfa0993f45f18b9d7c4314b9ccedca&address=$sa").get
+                    println(loc_result)
+                    val head = (loc_result \ "geocodes").asOpt[List[JsValue]].get.head
+                    val abc = (head \ "location").asOpt[String].get.split(",").map (_.toDouble)
+
+                    val pin_builder = MongoDBObject.newBuilder
+                    pin_builder += "type" -> "Point"
+                    pin_builder += "coordinates" -> (abc.head :: abc.tail.head :: Nil)
+
+                    println(pin_builder.result)
+                    val tmp = iter.asInstanceOf[BasicDBObject]
+                    tmp.append("pin", pin_builder.result)
+                    db.updateObject(tmp.asInstanceOf[DBObject], "providers", "_id")
+                }
+
+                Map("a" -> toJson(sa))
+            }
+            // (Some(m ++ Map("providers" -> toJson(reVal))), None)
+            (Some(Map("reset" -> toJson("success"))), None)
+
+        } catch {
+            case ex : Exception => println(s"search provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }
