@@ -194,15 +194,21 @@ object ProvidersLevelModule extends ModuleTrait {
             val reVal = db.queryMultipleObject(o, "levels").map { iter =>
                 val ssd : Calendar = new GregorianCalendar()
                 ssd.setTime(new Date(iter.get("ssd").get.asOpt[Long].get))
-                val ssd_month = ssd.get(Calendar.MONTH) + 1
-                val ssd_day = ssd.get(Calendar.DAY_OF_MONTH)
 
                 val sed : Calendar = new GregorianCalendar()
                 sed.setTime(new Date(iter.get("sed").get.asOpt[Long].get))
-                val sed_month = sed.get(Calendar.MONTH) + 1
-                val sed_day = sed.get(Calendar.DAY_OF_MONTH)
 
-                (ssd_month, ssd_day) :: (sed_month, sed_day) :: Nil
+                var lst : List[(Int, Int)]= Nil
+                while (ssd.getTimeInMillis <= sed.getTimeInMillis) {
+                    val month = ssd.get(Calendar.MONTH) + 1
+                    val day = ssd.get(Calendar.DAY_OF_MONTH)
+                    lst = (month, day) :: lst
+                    ssd.add(Calendar.DAY_OF_MONTH, 1)
+                }
+
+//                (ssd_month, ssd_day) :: (sed_month, sed_day) :: Nil
+                lst
+
             }.flatten.groupBy(_._1).map (x => (x._1, x._2.map (y => y._2)))
                 .map { iter =>
                     Map("month" -> toJson(iter._1), "days" -> toJson(iter._2.distinct.sorted))
