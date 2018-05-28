@@ -32,7 +32,7 @@ class AnswerController @Inject() (as_inject: ActorSystem, dbt : dbInstanceManage
             :: msg_queryUser(jv)
             :: msg_pushUser(jv)
             :: msg_queryScores(jv)
-//            :: msg_preAnswerScores(jv)
+            :: msg_preAnswerScores(jv)
             :: msg_randomGenerator(jv)
             :: msg_randomAnswers(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))

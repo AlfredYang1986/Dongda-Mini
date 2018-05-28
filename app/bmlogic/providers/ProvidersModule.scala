@@ -1,13 +1,13 @@
 package bmlogic.providers
 
-import java.io.{File, FileInputStream, FileOutputStream}
+import java.io.{File, FileInputStream, FileOutputStream, PrintWriter}
 import java.util.UUID
 
 import bmlogic.common.mergestepresult.MergeStepResult
 import bmlogic.providers.ProvidersData._
 import bmlogic.providers.ProvidersMessage._
 import com.mongodb.BasicDBObject
-import com.mongodb.casbah.Imports.{DBObject, ObjectId}
+import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.commons.MongoDBObject
 import com.pharbers.ErrorCode
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
@@ -35,6 +35,8 @@ object ProvidersModule extends ModuleTrait {
 
         case msg_resetProviderLogo(data) => resetProviderLogo(data)
         case msg_resetLocationPin(data) => resetLocationPin(data)
+        case msg_resetProviderSearchId(data) => resetProviderSearchId(data)
+        case msg_exportProviders(data) => exportProviders(data)
         case _ => ???
     }
 
@@ -116,7 +118,8 @@ object ProvidersModule extends ModuleTrait {
             val js = MergeStepResult(data, pr)
             val m = pr.map (x => x).getOrElse(Map.empty)
 
-            import inner_traits.sc
+//            import inner_traits.sc
+            import inner_traits.sssc
             import inner_traits.d2m
             val o : DBObject = js
             db.queryObject(o, "providers").map { reVal =>
@@ -167,7 +170,7 @@ object ProvidersModule extends ModuleTrait {
             import inner_traits.asc
             import inner_traits.d2m
             val o : DBObject = js
-            val reVal = db.queryMultipleObject(o, "providers")
+            val reVal = db.queryMultipleObject(o, "providers", skip = 0, take = 100)
 
             (Some(m ++ Map("providers" -> toJson(reVal))), None)
 
@@ -391,5 +394,78 @@ object ProvidersModule extends ModuleTrait {
         } catch {
             case ex : Exception => println(s"search provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
+    }
+
+    def resetProviderSearchId(data : JsValue)
+                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            var reVal =
+                db.queryMultipleObject(DBObject(), "providers", take = 100, sort = "search_id") { iter =>
+                    val last = iter.getAs[Number]("search_id").map (_.intValue).getOrElse(-1)
+                    val provider_id = iter.getAs[ObjectId]("_id").get.toString
+
+                    Map (
+                        "search_id" -> toJson(last),
+                        "provider_id" -> toJson(provider_id)
+                    )
+                }.head.get("search_id").get.asOpt[Int].get + 1
+
+            db.queryMultipleObject(DBObject(), "providers", take = 100) { iter =>
+                if (iter.getAs[Number]("search_id").get.intValue < 0) {
+                    iter += "search_id" -> reVal.asInstanceOf[Number]
+                    db.updateObject(iter, "providers", "_id")
+                    reVal += 1
+                }
+                Map("search_id" -> toJson("success"))
+            }
+
+            (Some(Map("providers" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => println(s"reset provider search id.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def exportProviders(data : JsValue)
+                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val reVal =
+                db.queryMultipleObject(DBObject(), "providers", take = 100, sort = "search_id") { iter =>
+                    val last = iter.getAs[Number]("search_id").map (_.intValue).getOrElse(-1)
+                    val short_name = iter.getAs[String]("short_name").get
+                    val address = iter.getAs[String]("address").get
+
+                    Map (
+                        "file_name" -> toJson(short_name + "-" + address),
+                        "search_id" -> toJson(last),
+                        "short_name" -> toJson(short_name)
+                    )
+                }.map { line =>
+                    line.get("file_name").get.asOpt[String].get + "," +
+                        line.get("search_id").get.asOpt[Int].get + "\n"
+                }
+
+            write2File(reVal)
+
+            (Some(Map("providers" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => println(s"reset provider search id.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def write2File(lst : List[String]): Unit = {
+        val writer = new PrintWriter(new File("test.txt"))
+
+        lst foreach (writer.write(_))
+        writer.close()
     }
 }

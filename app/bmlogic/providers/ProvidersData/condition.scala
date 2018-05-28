@@ -31,25 +31,40 @@ trait condition {
         builder.result
     }
 
-    implicit val asc : JsValue => DBObject = { js =>
-        val sc =
-            (js \ "condition" \ "pin").asOpt[JsValue].map { pin =>
-                val lat = (pin \ "latitude").asOpt[Float].map(x => x).getOrElse(throw new Exception("search service input error"))
-                val log = (pin \ "longitude").asOpt[Float].map(x => x).getOrElse(throw new Exception("search service input error"))
-                val tmp = MongoDBObject(
-                    "pin" -> MongoDBObject(
-                        "$nearSphere" -> MongoDBObject(
-                            "type" -> "Point",
-                            "coordinates" -> MongoDBList(log, lat)
-                        ),
-                        "$maxDistance" -> 5000))
-                Some(tmp)
-            }.getOrElse(None)
+    implicit val sssc : JsValue => DBObject = { js =>
+        val con = (js \ "condition").asOpt[JsValue].get
 
-        sc match {
-            case None => DBObject()
-            case Some(x) => x
+        val str_search_id = (con \ "search_id").asOpt[String].get
+        val tmp = URLDecoder.decode(str_search_id, "UTF-8").toInt
+        val builder = MongoDBObject.newBuilder
+        builder += "search_id" -> tmp
+
+        builder.result
+    }
+
+    implicit val asc : JsValue => DBObject = { js =>
+
+        try {
+            val sc =
+                (js \ "condition" \ "pin").asOpt[JsValue].map { pin =>
+                    val lat = (pin \ "latitude").asOpt[Float].map(x => x).getOrElse(throw new Exception("search service input error"))
+                    val log = (pin \ "longitude").asOpt[Float].map(x => x).getOrElse(throw new Exception("search service input error"))
+                    val tmp = MongoDBObject(
+                        "pin" -> MongoDBObject(
+                            "$nearSphere" -> MongoDBObject(
+                                "type" -> "Point",
+                                "coordinates" -> MongoDBList(log, lat)
+                            ),
+                            "$maxDistance" -> 10000))
+                    Some(tmp)
+                }.getOrElse(None)
+
+            sc match {
+                case None => DBObject()
+                case Some(x) => x
+            }
+        } catch {
+            case _ : Exception => DBObject()
         }
-//        DBObject()
     }
 }

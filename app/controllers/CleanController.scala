@@ -2,7 +2,7 @@ package controllers
 
 import akka.actor.ActorSystem
 import bmlogic.answer.answerMessage.msg_resetRandomIndex
-import bmlogic.providers.ProvidersMessage.{msg_resetLocationPin, msg_resetProviderLogo}
+import bmlogic.providers.ProvidersMessage.{msg_exportProviders, msg_resetLocationPin, msg_resetProviderLogo, msg_resetProviderSearchId}
 import bmlogic.providerslevel.ProvidersLevelMessage.msg_resetLevels
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
@@ -43,4 +43,17 @@ class CleanController @Inject() (as_inject: ActorSystem, dbt : dbInstanceManager
             :: msg_resetLocationPin(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
+
+    def resetProvidersSearchId = Action (request => raq.requestArgs(request) { jv =>
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push"))), jv)
+            :: msg_resetProviderSearchId(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
+
+    def exportProviders = Action (request => raq.requestArgs(request) { jv =>
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push"))), jv)
+            :: msg_exportProviders(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
+
 }

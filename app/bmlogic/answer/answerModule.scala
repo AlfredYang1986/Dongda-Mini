@@ -117,13 +117,13 @@ object answerModule extends ModuleTrait {
             val js = MergeStepResult(data, pr)
             val m = pr.map (x => x).getOrElse(Map.empty)
 
-//            if ((js \ "answer opp").asOpt[Int].map(x => x == 1).getOrElse(false)) {
+            if ((js \ "answer opp").asOpt[Int].map(x => x == 1).getOrElse(false)) {
                 val a = randomNew(5, count)
                 (Some(m ++ Map("random" -> toJson(a))), None)
-//            } else {
-//                val a : List[Int] = Nil
-//                (Some(m ++ Map("random" -> toJson(a))), None)
-//            }
+            } else {
+                val a : List[Int] = Nil
+                (Some(m ++ Map("random" -> toJson(a))), None)
+            }
 
         } catch {
             case ex : Exception => println(s"random generator error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))

@@ -30,6 +30,8 @@ POST     /answer/reset                           controllers.CleanController.res
 POST     /levels/reset                           controllers.CleanController.resetLevels
 POST     /logo/reset                             controllers.CleanController.resetLogo
 POST     /address/reset                          controllers.CleanController.resetPin
+POST     /searchId/reset                         controllers.CleanController.resetProvidersSearchId
+POST     /searchId/export                        controllers.CleanController.exportProviders
 
 GET      /page/business                          controllers.PageController.business
 GET      /page/activity/:id                      controllers.PageController.activity(id)

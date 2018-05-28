@@ -31,6 +31,8 @@ trait creation {
         builder += "other" -> (data \ "other").asOpt[String].map (x => x).getOrElse("")
         builder += "date" -> new Date().getTime
 
+        builder += "search_id" -> (data \ "search_id").asOpt[Int].map (x => x).getOrElse(-1)
+
         builder.result
     }
 }
