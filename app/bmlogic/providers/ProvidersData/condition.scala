@@ -43,7 +43,6 @@ trait condition {
     }
 
     implicit val asc : JsValue => DBObject = { js =>
-
         try {
             val sc =
                 (js \ "condition" \ "pin").asOpt[JsValue].map { pin =>

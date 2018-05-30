@@ -18,8 +18,8 @@ trait creation {
         builder += "is_top" -> (data \ "is_top").asOpt[Int].get
         builder += "sd" -> (data \ "sd").asOpt[Long].get
         builder += "ed" -> (data \ "ed").asOpt[Long].get
-        builder += "ssd" -> (data \ "sd").asOpt[Long].map (x => x).getOrElse(0L)
-        builder += "sed" -> (data \ "ed").asOpt[Long].map (x => x).getOrElse(0L)
+        builder += "ssd" -> (data \ "ssd").asOpt[Long].map (x => x).getOrElse(0L)
+        builder += "sed" -> (data \ "sed").asOpt[Long].map (x => x).getOrElse(0L)
         builder += "age" -> (data \ "age").asOpt[String].get
         builder += "date" -> new Date().getTime
 

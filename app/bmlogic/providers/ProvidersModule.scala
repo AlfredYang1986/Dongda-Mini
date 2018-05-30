@@ -307,14 +307,9 @@ object ProvidersModule extends ModuleTrait {
                 Map("a" -> toJson(short_name))
             }.map (x => x.get("a").get.asOpt[String].get).distinct.foreach { name =>
                 val (_, uuid) = copyFiles(name, logo_path + name + ".jpg")
-                db.queryMultipleObject(DBObject("short_name" -> name), "providers") { iter =>
-//                    if (iter.get("logo").asInstanceOf[String] == "") {
-                        val tmp = iter.asInstanceOf[BasicDBObject]
-                        tmp.append("logo", uuid)
-                        println(tmp)
-                        db.updateObject(tmp.asInstanceOf[DBObject], "providers", "_id")
-//                    }
-
+                db.queryMultipleObject(DBObject("short_name" -> name), "providers", take = 100) { iter =>
+                    iter += "logo" -> uuid
+                    db.updateObject(iter, "providers", "_id")
                     Map("he" -> toJson("he"))
                 }
             }
@@ -415,7 +410,7 @@ object ProvidersModule extends ModuleTrait {
                 }.head.get("search_id").get.asOpt[Int].get + 1
 
             db.queryMultipleObject(DBObject(), "providers", take = 100) { iter =>
-                if (iter.getAs[Number]("search_id").get.intValue < 0) {
+                if (iter.getAs[Number]("search_id").map (x => x.intValue).getOrElse(-1) < 0) {
                     iter += "search_id" -> reVal.asInstanceOf[Number]
                     db.updateObject(iter, "providers", "_id")
                     reVal += 1

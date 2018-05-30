@@ -164,8 +164,14 @@ object ProvidersLevelModule extends ModuleTrait {
                 providers.map { iter =>
                     val m_iter = iter.as[JsObject].value.toMap
                     val tmp = provider_ages.find(p =>
-                        (p \ "provider_id").asOpt[String].get == (iter \ "provider_id").asOpt[String].get).get
-                    toJson(m_iter ++ Map("age" -> toJson((tmp \ "age").asOpt[String].get)))
+                        (p \ "provider_id").asOpt[String].get == (iter \ "provider_id").asOpt[String].get)
+
+                    tmp match {
+                        case None =>
+                            toJson(m_iter ++ Map("age" -> toJson("")))
+                        case Some(x) =>
+                            toJson(m_iter ++ Map("age" -> toJson((x \ "age").asOpt[String].get)))
+                    }
                 }
 
             val tmp = m - "provider_ages"
@@ -173,6 +179,7 @@ object ProvidersLevelModule extends ModuleTrait {
 
         } catch {
             case ex : Exception => println(s"merge display age.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+//            case ex : Exception => ex.printStackTrace();(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
