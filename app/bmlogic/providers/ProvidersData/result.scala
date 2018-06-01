@@ -6,6 +6,17 @@ import play.api.libs.json.Json.toJson
 
 trait result {
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
+
+        val book = obj.getAs[DBObject]("book").map { tmp =>
+            Map (
+                "method" -> toJson(tmp.getAs[String]("method").get),
+                "phoneNo" -> toJson(tmp.getAs[String]("phoneNo").get)
+            )
+        }.getOrElse(Map(
+            "method" -> toJson("不需要预约"),
+            "phoneNo" -> toJson("")
+        ))
+
         Map(
             "provider_id" -> toJson(obj.getAs[ObjectId]("_id").get.toString),
             "brand_name" -> toJson(obj.getAs[String]("brand_name").get),
@@ -24,6 +35,7 @@ trait result {
             "festival" -> toJson(obj.getAs[String]("festival").map (x => x).getOrElse("")),
             "other" -> toJson(obj.getAs[String]("other").map (x => x).getOrElse("")),
             "age" -> toJson(obj.getAs[List[String]]("age").map (x => x).getOrElse(Nil)),
+            "book" -> toJson(book),
             "date" -> toJson(obj.getAs[Number]("date").get.longValue)
         )
     }

@@ -13,7 +13,6 @@ trait condition {
 
     implicit val mc : JsValue => DBObject = { js =>
         val lst = (js \ "condition" \ "providers").asOpt[List[String]].get
-        println(lst)
         lst match {
             case Nil => DBObject("search" -> "null")
             case xls : List[String] => $or(xls map (x => DBObject("_id" -> new ObjectId(x))))
@@ -54,7 +53,7 @@ trait condition {
                                 "type" -> "Point",
                                 "coordinates" -> MongoDBList(log, lat)
                             ),
-                            "$maxDistance" -> 10000))
+                            "$maxDistance" -> 100000))
                     Some(tmp)
                 }.getOrElse(None)
 

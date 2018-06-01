@@ -57,4 +57,9 @@ trait condition {
         builder += "is_top" -> 1
         $and(("sd" $lte date) :: ("ed" $gte date) :: builder.result :: Nil)
     }
+
+    implicit val ttc : JsValue => DBObject = { js =>
+        val date = new Date().getTime
+        $and(("sd" $lte date) :: ("ed" $gte date) :: Nil)
+    }
 }

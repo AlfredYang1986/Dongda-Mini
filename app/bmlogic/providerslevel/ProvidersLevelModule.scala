@@ -1,5 +1,6 @@
 package bmlogic.providerslevel
 
+import java.text.SimpleDateFormat
 import java.util.{Calendar, Date, GregorianCalendar}
 
 import bmlogic.common.mergestepresult.MergeStepResult
@@ -24,6 +25,8 @@ object ProvidersLevelModule extends ModuleTrait {
         case msg_mergeDisplayAges(data) => mergeDisplayAges(data)(pr)
         case msg_queryServiceDate(data) => queryServiceDate(data)(pr)
         case msg_mergeServiceDate(data) => mergeServiceDate(data)(pr)
+        case msg_queryDisplayTimes(data) => queryDisplayTimes(data)(pr)
+        case msg_mergeDisplayTimes(data) => mergeDisplayTimes(data)(pr)
         case msg_resetLevels(data) => resetLevels(data)
         case _ => ???
     }
@@ -139,7 +142,7 @@ object ProvidersLevelModule extends ModuleTrait {
             import inner_traits.msc
             import inner_traits.colr
             val o : DBObject = js
-            val reVal = db.queryMultipleObject(o, "levels")
+            val reVal = db.queryMultipleObject(o, "levels", take = 300)
 
             (Some(m ++ Map("providers_ages" -> toJson(reVal))), None)
 
@@ -157,21 +160,18 @@ object ProvidersLevelModule extends ModuleTrait {
             val js = MergeStepResult(data, pr)
             val m = pr.map (x => x).getOrElse(Map.empty)
 
-            val provider_ages = (js \ "providers_ages").asOpt[List[JsValue]].get
+//            val provider_ages = (js \ "providers_ages").asOpt[List[JsValue]].get
             val providers = (js \ "providers").asOpt[List[JsValue]].get
 
             val provider_new =
                 providers.map { iter =>
-                    val m_iter = iter.as[JsObject].value.toMap
-                    val tmp = provider_ages.find(p =>
-                        (p \ "provider_id").asOpt[String].get == (iter \ "provider_id").asOpt[String].get)
-
-                    tmp match {
-                        case None =>
-                            toJson(m_iter ++ Map("age" -> toJson("")))
-                        case Some(x) =>
-                            toJson(m_iter ++ Map("age" -> toJson((x \ "age").asOpt[String].get)))
+                    val ages = (iter \ "age").asOpt[List[String]].get
+                    var str = ""
+                    ages.foreach { iter =>
+                        str += iter + "岁 "
                     }
+                    val m_iter = iter.as[JsObject].value.toMap
+                    toJson(m_iter ++ Map("age" -> toJson(str.trim)))
                 }
 
             val tmp = m - "provider_ages"
@@ -205,21 +205,34 @@ object ProvidersLevelModule extends ModuleTrait {
                 val sed : Calendar = new GregorianCalendar()
                 sed.setTime(new Date(iter.get("sed").get.asOpt[Long].get))
 
-                var lst : List[(Int, Int)]= Nil
+                val age = iter.get("age").get.asOpt[String].get
+
+                val df = new SimpleDateFormat("MMdd")
+                val df2 = new SimpleDateFormat("HH:mm")
+                var lst : List[Map[String, JsValue]]= Nil
                 while (ssd.getTimeInMillis <= sed.getTimeInMillis) {
-                    val month = ssd.get(Calendar.MONTH) + 1
-                    val day = ssd.get(Calendar.DAY_OF_MONTH)
-                    lst = (month, day) :: lst
+                    val sd = df.format(ssd.getTime)
+                    val sh = df2.format(ssd.getTime)
+                    val eh = df2.format(sed.getTime)
+                    lst =
+                        Map (
+                            "day" -> toJson(sd),
+                            "hourstart" -> toJson(sh),
+                            "hourend" -> toJson(eh),
+                            "age" -> toJson(age)
+                        ) :: lst
                     ssd.add(Calendar.DAY_OF_MONTH, 1)
                 }
 
 //                (ssd_month, ssd_day) :: (sed_month, sed_day) :: Nil
                 lst
 
-            }.flatten.groupBy(_._1).map (x => (x._1, x._2.map (y => y._2)))
-                .map { iter =>
-                    Map("month" -> toJson(iter._1), "days" -> toJson(iter._2.distinct.sorted))
-                }.toList.sortBy(p => p.get("month").get.asOpt[Int].get)
+            }.flatten.groupBy(_.get("day").get.asOpt[String].get).map { iter =>
+                Map (
+                    "day" -> toJson(iter._1),
+                    "detail" -> toJson(iter._2.sortBy(p => p.get("hourstart").get.asOpt[String].get))
+                )
+            }.toList.sortBy(p => p.get("day").get.asOpt[String].get)
 
             (Some(m ++ Map("server_time" -> toJson(reVal))), None)
 
@@ -279,6 +292,66 @@ object ProvidersLevelModule extends ModuleTrait {
 
         } catch {
             case ex : Exception => println(s"reset levels.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def queryDisplayTimes(data : JsValue)
+                         (pr : Option[Map[String, JsValue]])
+                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val count =
+            {
+                import inner_traits.tr
+                db.queryCount(DBObject(), "levels").get
+            }
+
+            import inner_traits.ttc
+            val reVal =
+                db.queryMultipleObject(data, "levels", skip = 0, take = count) { iter =>
+                    val provider_id = iter.getAs[String]("provider_id").get
+                    Map (
+                        "provider_id" -> toJson(provider_id)
+                    )
+                }.map (x => x.get("provider_id").get.asOpt[String].get)
+
+            (Some(m ++ Map("time_over" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => println(s"query display time.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+
+    }
+
+    def mergeDisplayTimes(data : JsValue)
+                         (pr : Option[Map[String, JsValue]])
+                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val time_over = (js \ "time_over").asOpt[List[String]].get
+            val providers = (js \ "providers").asOpt[List[JsValue]].get
+
+            val providers_up =
+                providers.map { iter =>
+                    val pid = (iter \ "provider_id").asOpt[String].get
+                    if (time_over.contains(pid)) Some(iter)
+                    else (None)
+                }.filterNot(_ == None).map (_.get)
+
+            val tmp = m - "time_over"
+            (Some(tmp ++ Map("providers" -> toJson(providers_up))), None)
+
+        } catch {
+            case ex : Exception => println(s"merge display time.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

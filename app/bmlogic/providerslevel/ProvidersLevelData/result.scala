@@ -25,6 +25,7 @@ trait result {
         Map (
             "level_id" -> toJson(obj.getAs[ObjectId]("_id").get.toString),
             "provider_id" -> toJson(obj.getAs[String]("provider_id").get),
+            "age" -> toJson(obj.getAs[String]("age").map (x => x).getOrElse("")),
             "ssd" -> toJson(obj.getAs[Number]("ssd").map (x => x.longValue).getOrElse(0L)),
             "sed" -> toJson(obj.getAs[Number]("sed").map (x => x.longValue).getOrElse(0L))
         )

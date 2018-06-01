@@ -37,6 +37,8 @@ object ProvidersModule extends ModuleTrait {
         case msg_resetLocationPin(data) => resetLocationPin(data)
         case msg_resetProviderSearchId(data) => resetProviderSearchId(data)
         case msg_exportProviders(data) => exportProviders(data)
+
+        case msg_resortProviders(data) => resortProviders(data)(pr)
         case _ => ???
     }
 
@@ -170,7 +172,9 @@ object ProvidersModule extends ModuleTrait {
             import inner_traits.asc
             import inner_traits.d2m
             val o : DBObject = js
-            val reVal = db.queryMultipleObject(o, "providers", skip = 0, take = 100)
+            val reVal = db.queryMultipleWithOutSort(o, "providers", skip = 0, take = 100)
+
+//            reVal.foreach(x => println(x.get("address").get.asOpt[String].get))
 
             (Some(m ++ Map("providers" -> toJson(reVal))), None)
 
@@ -462,5 +466,29 @@ object ProvidersModule extends ModuleTrait {
 
         lst foreach (writer.write(_))
         writer.close()
+    }
+
+    def resortProviders(data : JsValue)
+                       (pr : Option[Map[String, JsValue]])
+                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+            val providers = (js \ "providers").asOpt[List[JsValue]].get
+
+            val tops = providers.filter(x => (x \ "is_top").asOpt[Int].get == 1)
+            val paids = providers.filter(x => (x \ "is_top").asOpt[Int].get == 0 && (x \ "isPaid").asOpt[Int].get == 1)
+            val others = providers.filter(x => (x \ "is_top").asOpt[Int].get == 0 && (x \ "isPaid").asOpt[Int].get == 0)
+
+            val providers_up = (tops :: paids :: others :: Nil).flatten
+
+            (Some(m ++ Map("providers" -> toJson(providers_up))), None)
+
+        } catch {
+            case ex : Exception => println(s"resort providers.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
     }
 }

@@ -24,4 +24,6 @@ object ProvidersMessage {
     case class msg_resetLocationPin(data : JsValue) extends msg_ProvidersCommand
     case class msg_resetProviderSearchId(data :JsValue) extends msg_ProvidersCommand
     case class msg_exportProviders(data : JsValue) extends msg_ProvidersCommand
+
+    case class msg_resortProviders(data : JsValue) extends msg_ProvidersCommand
 }
