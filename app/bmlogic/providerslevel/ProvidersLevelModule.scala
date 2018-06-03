@@ -90,7 +90,7 @@ object ProvidersLevelModule extends ModuleTrait {
             import inner_traits.spc
             import inner_traits.colr
             val o : DBObject = js
-            val reVal = db.queryMultipleObject(o, "levels")
+            val reVal = db.queryMultipleObject(o, "levels", sort = "sed")
                             .map (x => x.get("provider_id").get.asOpt[String].get)
 
             val tmp = toJson(condition.as[JsObject].value.toMap ++ Map("providers" -> toJson(reVal)))
