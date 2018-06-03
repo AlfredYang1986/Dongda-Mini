@@ -60,7 +60,7 @@ class ProvidersController @Inject() (as_inject: ActorSystem, dbt : dbInstanceMan
             :: msg_mergeTopProvider(jv)
             :: msg_queryDisplayTimes(jv)
             :: msg_mergeDisplayTimes(jv)
-            :: msg_resortProviders(jv)
+//            :: msg_resortProviders(jv)
             :: msg_dropUnwantedMessage(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })

@@ -35,6 +35,7 @@ trait condition {
 
         val str_search_id = (con \ "search_id").asOpt[String].get
         val tmp = URLDecoder.decode(str_search_id, "UTF-8").toInt
+        println(tmp)
         val builder = MongoDBObject.newBuilder
         builder += "search_id" -> tmp
 

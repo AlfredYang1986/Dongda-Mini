@@ -77,7 +77,7 @@ object ProvidersModule extends ModuleTrait {
             (Some(Map("pop provider" -> toJson("success"))), None)
 
         } catch {
-            case ex : Exception => println(s"push.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"pop.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
@@ -105,7 +105,7 @@ object ProvidersModule extends ModuleTrait {
             )
 
         } catch {
-            case ex : Exception => println(s"push.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"query provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
@@ -131,7 +131,7 @@ object ProvidersModule extends ModuleTrait {
             )
 
         } catch {
-            case ex : Exception => println(s"push.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"query multi one.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
@@ -154,7 +154,7 @@ object ProvidersModule extends ModuleTrait {
             (Some(m ++ Map("providers" -> toJson(reVal))), None)
 
         } catch {
-            case ex : Exception => println(s"push.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"query provider multi.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
@@ -203,7 +203,7 @@ object ProvidersModule extends ModuleTrait {
             (Some(m ++ Map("providers" -> toJson(providers_up))), None)
 
         } catch {
-            case ex : Exception => println(s"search provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"merge checked provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
@@ -215,6 +215,7 @@ object ProvidersModule extends ModuleTrait {
             val js = MergeStepResult(data, pr)
             val m = pr.map (x => x).getOrElse(Map.empty)
 
+            println(js)
             val provider = (js \ "provider").asOpt[JsValue].get
             val checked_lst = (js \ "checked_lst").asOpt[List[String]].get
 
@@ -225,7 +226,7 @@ object ProvidersModule extends ModuleTrait {
             (Some(m ++ Map("provider" -> toJson(provider_another))), None)
 
         } catch {
-            case ex : Exception => println(s"search provider.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"merge checked provider one.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 

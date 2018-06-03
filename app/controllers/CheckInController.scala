@@ -5,7 +5,7 @@ import bmlogic.checkin.CheckInMessage.{msg_dropCheckedUnwanted, msg_isChecked, m
 import bmlogic.miniauth.MiniAuthMessage.{msg_dropWXUnwanted, msg_queryWXAuthPara}
 import bmlogic.providers.ProvidersMessage.{msg_dropUnwantedMessage, msg_mergeCheckedProviderOne, msg_queryProviderOne}
 import bmlogic.providerslevel.ProvidersLevelMessage.{msg_mergeServiceDate, msg_pushProvidersLevel, msg_queryProvidersLevel, msg_queryServiceDate}
-import bmlogic.scroes.ScoresMessage.{msg_addScores, msg_postCheckInScores, msg_queryScores}
+import bmlogic.scroes.ScoresMessage._
 import bmlogic.user.UserMessage.{msg_pushUser, msg_queryUser}
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
@@ -59,6 +59,7 @@ class CheckInController @Inject() (as_inject: ActorSystem, dbt : dbInstanceManag
             :: msg_queryUser(jv)
             :: msg_pushUser(jv)
             :: msg_queryScores(jv)
+            :: msg_addScoresIfNotExist(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 

@@ -17,6 +17,7 @@ object ScoresModule extends ModuleTrait {
 
     def dispatchMsg(msg: MessageDefines)(pr: Option[Map[String, JsValue]])(implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_addScores(data) => addScores(data)(pr)
+        case msg_addScoresIfNotExist(data) => addScoresIfNotExist(data)(pr)
         case msg_queryScores(data) => queryScores(data)(pr)
         case msg_preAnswerScores(data) => preAnswerScores(data)(pr)
         case msg_postAnswerScores(data) => postAnswerScores(data)(pr)
@@ -24,6 +25,46 @@ object ScoresModule extends ModuleTrait {
     }
 
     object inner_traits extends creation with condition with result
+
+    def addScoresIfNotExist(data : JsValue)
+                  (pr : Option[Map[String, JsValue]])
+                  (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map (x => x).getOrElse(Map.empty)
+
+//            if ((js \ "check_in").asOpt[String].map (x => x == "already checked").getOrElse(false)) {
+//                (pr, None)
+//            } else {
+                if ((js \ "scores").asOpt[String].map(x => x == "not exist").getOrElse(false)) {
+
+                    import inner_traits.m2d
+                    import inner_traits.d2m
+                    val o: DBObject = js
+                    db.insertObject(o, "scores", "_id")
+                    val reVal: Map[String, JsValue] = o
+
+                    (Some(m ++ Map("scores" -> toJson(reVal))), None)
+
+                } else {
+
+                    import inner_traits.qc
+                    import inner_traits.d2m
+                    val o: DBObject = js
+                    val reVal =
+                        db.queryObject(o, "scores")
+
+                    (Some(m ++ Map("scores" -> toJson(reVal))), None)
+                }
+//            }
+
+        } catch {
+            case ex : Exception => println(s"add scores 2.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
 
     def addScores(data : JsValue)
                   (pr : Option[Map[String, JsValue]])
@@ -87,7 +128,7 @@ object ScoresModule extends ModuleTrait {
             db.queryObject(o, "scores").map { x =>
                 (Some(Map("scores" -> toJson(x)) ++ m), None)
             }.getOrElse {
-                (Some(Map("scores" -> toJson("not exist")) ++ m), None)
+                (Some(Map("scores" -> toJson("not exist"), "first" -> toJson(1)) ++ m), None)
             }
 
         } catch {

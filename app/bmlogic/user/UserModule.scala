@@ -38,7 +38,7 @@ object UserModule extends ModuleTrait {
                 val o : DBObject = js
                 db.insertObject(o, "users", "_id")
                 val reVal = o.get("_id").asInstanceOf[ObjectId].toString
-                (Some(m ++ Map("user" -> toJson(Map("user_id" -> reVal)))), None)
+                (Some(m ++ Map("user" -> toJson(Map("user_id" -> reVal)), "first_login" -> toJson(1))), None)
             } else {
                 val user = (js \ "user").asOpt[JsValue].get
                 val reVal = (user \ "user_id").asOpt[String].get

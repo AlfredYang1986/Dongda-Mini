@@ -20,12 +20,13 @@ trait creation {
         builder += "_id" -> ObjectId.get()
 
         val (a, b, c, d, e) =
-            (js \ "level").asOpt[String].map (x => x).getOrElse("scores_A") match {
-                case "scores_A" => (1, 0, 0, 0, 0)
-                case "scores_B" => (0, 1, 0, 0, 0)
-                case "scores_C" => (0, 0, 1, 0, 0)
-                case "scores_D" => (0, 0, 0, 1, 0)
-                case "scores_E" => (0, 0, 0, 0, 1)
+            (js \ "level").asOpt[String].map (x => x).getOrElse("scores_0") match {
+                case "scores_0" => (0, 3, 0, 0, 0)
+                case "scores_A" => (1, 3, 0, 0, 0)
+                case "scores_B" => (0, 3, 0, 0, 0)
+                case "scores_C" => (0, 3, 1, 0, 0)
+                case "scores_D" => (0, 3, 0, 1, 0)
+                case "scores_E" => (0, 3, 0, 0, 1)
             }
 
         builder += "scores_A" -> a
@@ -44,6 +45,7 @@ trait creation {
 
         val (a, b, c, d, e) =
             (js \ "level").asOpt[String].map (x => x).getOrElse("scores_A") match {
+                case "scores_0" => (0, 0, 0, 0, 0)
                 case "scores_A" => (1, 0, 0, 0, 0)
                 case "scores_B" => (0, 1, 0, 0, 0)
                 case "scores_C" => (0, 0, 1, 0, 0)
