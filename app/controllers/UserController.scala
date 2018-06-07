@@ -2,6 +2,7 @@ package controllers
 
 import akka.actor.ActorSystem
 import bmlogic.miniauth.MiniAuthMessage.{msg_dropWXUnwanted, msg_queryWXAuthPara}
+import bmlogic.scroes.ScoresMessage.msg_updateDailyScores
 import bmlogic.user.UserMessage._
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
@@ -26,6 +27,10 @@ class UserController @Inject() (as_inject: ActorSystem, dbt : dbInstanceManager,
             :: msg_queryWXAuthPara(jv)
             :: msg_queryUser(jv)
             :: msg_pushUser(jv)
+            :: msg_queryUser(jv)
+            :: msg_lastLoginTime(jv)
+            :: msg_updateLoginTime(jv)
+            :: msg_updateDailyScores(jv)
             :: msg_dropWXUnwanted(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })

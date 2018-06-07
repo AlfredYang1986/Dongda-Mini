@@ -22,6 +22,8 @@ object ScoresModule extends ModuleTrait {
         case msg_preAnswerScores(data) => preAnswerScores(data)(pr)
         case msg_postAnswerScores(data) => postAnswerScores(data)(pr)
         case msg_postCheckInScores(data) => postCheckInScores(data)(pr)
+
+        case msg_updateDailyScores(data) => updateDailyScores(data)(pr)
     }
 
     object inner_traits extends creation with condition with result
@@ -250,5 +252,36 @@ object ScoresModule extends ModuleTrait {
         } catch {
             case ex : Exception => println(s"post check in scores.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
+    }
+
+    def updateDailyScores(data : JsValue)
+                         (pr : Option[Map[String, JsValue]])
+                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("cli").get
+
+            val js = MergeStepResult(data, pr)
+            val m = pr.map(x => x).getOrElse(Map.empty)
+
+            val mtd = (js \ "more than one day").asOpt[Int].get
+
+            if (mtd == 1) {
+                import inner_traits.sc
+                val o : DBObject = js
+                db.queryObject(o, "scores") { obj =>
+                    val up: DBObject = inner_traits.dy2d(js, obj)
+                    db.updateObject(up, "scores", "_id")
+                    Map("a" -> toJson("b"))
+                }
+            }
+
+            (pr, None)
+
+        } catch {
+            case ex : Exception => println(s"update daily scores.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+
     }
 }

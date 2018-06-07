@@ -92,4 +92,13 @@ trait creation {
         obj += "scores_C" -> tmp_C.asInstanceOf[Number]
         obj
     }
+
+    implicit val dy2d : (JsValue, DBObject) => DBObject = { (js, obj) =>
+        val data = js
+        assert(obj.getAs[String]("user_id").get == (data \ "user" \ "user_id").asOpt[String].get)
+
+        val tmp_B = obj.getAs[Number]("scores_B").get.intValue + 3
+        obj += "scores_B" -> tmp_B.asInstanceOf[Number]
+        obj
+    }
 }

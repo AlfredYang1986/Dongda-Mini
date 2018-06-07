@@ -11,6 +11,7 @@ trait result {
             "name" -> toJson(obj.getAs[String]("name").get),
             "photo" -> toJson(obj.getAs[String]("photo").get),
             "wechat_id" -> toJson(obj.getAs[String]("wechat_id").get),
+            "last" -> toJson(obj.getAs[Number]("last").map (x => x.longValue).getOrElse(0L)),
             "date" -> toJson(obj.getAs[Number]("date").get.longValue)
         )
     }
